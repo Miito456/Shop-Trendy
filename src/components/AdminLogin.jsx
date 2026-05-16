@@ -18,18 +18,13 @@ const AdminLogin = ({ isOpen, onClose }) => {
         {/* Logo */}
         <div style={styles.logoWrapper}>
           <div style={styles.logo}>
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-              <rect x="4" y="4" width="12" height="12" rx="2" fill="white" />
-              <rect x="20" y="4" width="12" height="12" rx="2" fill="white" />
-              <rect x="4" y="20" width="12" height="12" rx="2" fill="white" />
-              <rect x="20" y="20" width="12" height="12" rx="2" fill="white" />
-            </svg>
+            ST
           </div>
         </div>
 
         {/* Título */}
         <h2 className="modal-title">
-          Shop<span style={styles.titleAccent}>TRENDY</span> Admin
+          Shop<span>TRENDY</span> <span style={styles.titleAccent}>Admin</span>
         </h2>
         <p className="modal-subtitle">Panel de Administración</p>
 
@@ -75,12 +70,14 @@ const styles = {
   logo: {
     width: '64px',
     height: '64px',
-    borderRadius: '16px',
-    background: 'linear-gradient(145deg, #f5a623, #e08c00)',
+    borderRadius: '50%',
+    background: '#111',
+    color: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 16px rgba(229,140,0,0.35)',
+    fontWeight: '700',
+    fontSize: '20px',
   },
   titleAccent: {
     color: '#e08c00',
