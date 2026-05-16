@@ -10,12 +10,18 @@ import ProfileModal from './components/ProfileModal';
 import CartDrawer from './components/CartDrawer';
 import './index.css';
 
+import AdminLogin from './components/AdminLogin'; //Anexado para la ruta del administrador
+import AboutUs from './pages/AboutUs'; //Anexado para la ruta de Nosotros
+import AdminDashboard from './pages/AdminDashboard'; //Anexado para la ruta del dashboard del administrador
+
 function App() {
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false); //Anexado para el estado del modal de administrador
 
   // Cart Management
   const addToCart = (product) => {
@@ -63,6 +69,11 @@ function App() {
   return (
     <Router>
       <div className="app-container">
+
+        <Routes>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Routes>
+
         <Header 
           cartCount={cartItemsCount} 
           onUserIconClick={handleUserIconClick}
@@ -73,9 +84,17 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/shop" element={<ShopPage cart={cart} addToCart={addToCart} />} />
           <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} />} />
+          
+          <Route path="/about" element={<AboutUs />} /> {/* Anexado para la ruta de Nosotros */}
+          
+          {/*
+          <Route path="/admin/dashboard" element={<AdminDashboard />} /> {/*Anexado para la ruta del dashboard del administrador
+          <Route path="/admin" element={<AdminLogin />} /> //Anexado para la ruta del administrador
+          */}
+
         </Routes>
         
-        <Footer />
+        <Footer onAdminClick={() => setIsAdminLoginOpen(true)} />
 
         <AuthModal 
           isOpen={isAuthModalOpen} 
@@ -97,6 +116,11 @@ function App() {
           updateQuantity={updateQuantity}
           removeFromCart={removeFromCart}
           clearCart={clearCart}
+        />
+
+        <AdminLogin
+          isOpen={isAdminLoginOpen}
+          onClose={() => setIsAdminLoginOpen(false)}
         />
       </div>
     </Router>

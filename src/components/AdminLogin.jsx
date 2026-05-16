@@ -1,0 +1,111 @@
+import React from 'react';
+import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; //Anexado para poder ingresar a las pantallas del admin
+
+const AdminLogin = ({ isOpen, onClose }) => {
+  const navigate = useNavigate(); //Anexado para poder ingresar a las pantallas del admin
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
+        
+        <button className="modal-close-btn" onClick={onClose}>
+          <X size={20} />
+        </button>
+
+        {/* Logo */}
+        <div style={styles.logoWrapper}>
+          <div style={styles.logo}>
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect x="4" y="4" width="12" height="12" rx="2" fill="white" />
+              <rect x="20" y="4" width="12" height="12" rx="2" fill="white" />
+              <rect x="4" y="20" width="12" height="12" rx="2" fill="white" />
+              <rect x="20" y="20" width="12" height="12" rx="2" fill="white" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Título */}
+        <h2 className="modal-title">
+          Shop<span style={styles.titleAccent}>TRENDY</span> Admin
+        </h2>
+        <p className="modal-subtitle">Panel de Administración</p>
+
+        {/* Formulario */}
+        <form className="modal-form">
+          <div className="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" placeholder="admin@shoptrendy.com" className="form-input" />
+          </div>
+
+          <div className="form-group">
+            <label>Contraseña</label>
+            <input type="password" placeholder="••••••••" className="form-input" />
+          </div>
+
+          <button 
+            type="button" 
+            className="btn-primary-full"
+            onClick={() => { onClose(); navigate('/admin/dashboard'); }}
+          >
+            Iniciar Sesión
+          </button>
+        </form>
+
+        {/* Credenciales de demostración */}
+        <div style={styles.demoBox}>
+          <p style={styles.demoTitle}>Credenciales de demostración:</p>
+          <p style={styles.demoText}>admin@shoptrendy.com</p>
+          <p style={styles.demoText}>admin123</p>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  logoWrapper: {
+    marginBottom: '16px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: '64px',
+    height: '64px',
+    borderRadius: '16px',
+    background: 'linear-gradient(145deg, #f5a623, #e08c00)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 4px 16px rgba(229,140,0,0.35)',
+  },
+  titleAccent: {
+    color: '#e08c00',
+  },
+  demoBox: {
+    marginTop: '16px',
+    width: '100%',
+    background: '#fffbea',
+    border: '1px solid #f5e4a0',
+    borderRadius: '10px',
+    padding: '14px 20px',
+    textAlign: 'center',
+  },
+  demoTitle: {
+    fontSize: '13px',
+    color: '#888',
+    margin: '0 0 6px',
+  },
+  demoText: {
+    fontSize: '13px',
+    color: '#c99a00',
+    fontWeight: '600',
+    margin: '2px 0',
+    fontFamily: 'monospace',
+  },
+};
+
+export default AdminLogin;

@@ -29,7 +29,7 @@ const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
       <nav className="header-nav-light">
         <Link to="/" className="nav-link-light">Inicio</Link>
         <Link to="/shop" className="nav-link-light">Catálogo</Link>
-        <a href="#about" className="nav-link-light">Nosotros</a>
+        <Link to="/about" className="nav-link-light">Nosotros</Link>
       </nav>
       
       <div className="header-right">
