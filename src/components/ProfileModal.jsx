@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { X, User, Package, MapPin, LogOut } from 'lucide-react';
 
 const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('perfil'); // 'perfil', 'pedidos', 'direccion'
-  
+  const [activeTab, setActiveTab] = useState('perfil');
+
   if (!isOpen || !user) return null;
 
   const mockOrders = [
@@ -13,7 +13,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
   ];
 
   const getStatusBadgeClass = (status) => {
-    switch(status) {
+    switch (status) {
       case 'Entregado': return 'badge-success';
       case 'En camino': return 'badge-info';
       case 'Procesando': return 'badge-warning';
@@ -23,14 +23,14 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content profile-modal" onClick={e => e.stopPropagation()}>
+      <div className="modal-content profile-modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
-        
+
         <h2 className="modal-title text-left">Mi Perfil</h2>
         <p className="modal-subtitle text-left">Administra tu información personal y revisa tus pedidos</p>
-        
+
         <div className="profile-header">
           <div className="profile-avatar">
             {user.name ? user.name.substring(0, 2).toUpperCase() : 'UD'}
@@ -42,19 +42,19 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
         </div>
 
         <div className="profile-tabs-nav">
-          <button 
+          <button
             className={`profile-tab-btn ${activeTab === 'perfil' ? 'active' : ''}`}
             onClick={() => setActiveTab('perfil')}
           >
             <User size={16} /> Perfil
           </button>
-          <button 
+          <button
             className={`profile-tab-btn ${activeTab === 'pedidos' ? 'active' : ''}`}
             onClick={() => setActiveTab('pedidos')}
           >
             <Package size={16} /> Pedidos
           </button>
-          <button 
+          <button
             className={`profile-tab-btn ${activeTab === 'direccion' ? 'active' : ''}`}
             onClick={() => setActiveTab('direccion')}
           >
@@ -67,7 +67,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
             <div className="tab-pane">
               <h4 className="tab-pane-title">Información Personal</h4>
               <p className="tab-pane-desc">Actualiza tu información personal</p>
-              
+
               <form className="modal-form">
                 <div className="form-group">
                   <label>Nombre Completo</label>
@@ -92,7 +92,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
             <div className="tab-pane">
               <h4 className="tab-pane-title">Historial de Pedidos</h4>
               <p className="tab-pane-desc">Revisa el estado de tus pedidos</p>
-              
+
               <div className="orders-list">
                 {mockOrders.map(order => (
                   <div key={order.id} className="order-item">

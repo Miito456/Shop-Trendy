@@ -1,14 +1,5 @@
 export const products = [
   {
-    id: 1,
-    title: "Bolsa Guess",
-    category: "accesorios",
-    price: 1600.00,
-    description: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
-    isSoldOut: false,
-    image: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?q=80&w=600&auto=format&fit=crop"
-  },
-  {
     id: 2,
     title: "Calcetines Adidas",
     category: "ropa-hombre",

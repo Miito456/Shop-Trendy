@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 const AuthModal = ({ isOpen, onClose, onLogin }) => {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
-  
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
@@ -22,18 +22,18 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
         <button className="modal-close-btn" onClick={onClose}>
           <X size={20} />
         </button>
-        
-        <h2 className="modal-title">Bienvenido a ShopTRENDY</h2>
+
+        <h2 className="modal-title">Bienvenido a Shop-Trendy</h2>
         <p className="modal-subtitle">Inicia sesión o crea una cuenta para continuar</p>
-        
+
         <div className="modal-tabs">
-          <button 
+          <button
             className={`modal-tab-btn ${activeTab === 'login' ? 'active' : ''}`}
             onClick={() => setActiveTab('login')}
           >
             Iniciar Sesión
           </button>
-          <button 
+          <button
             className={`modal-tab-btn ${activeTab === 'register' ? 'active' : ''}`}
             onClick={() => setActiveTab('register')}
           >
@@ -48,12 +48,12 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
               <input type="text" placeholder="Usuario Demo" className="form-input" required />
             </div>
           )}
-          
+
           <div className="form-group">
             <label>Correo Electrónico</label>
             <input type="email" placeholder="usuario@gmail.com" className="form-input" required />
           </div>
-          
+
           <div className="form-group">
             <label>Contraseña</label>
             <input type="password" placeholder="••••••••" className="form-input" required />
@@ -65,7 +65,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
               <input type="password" placeholder="••••••••" className="form-input" required />
             </div>
           )}
-          
+
           <button type="submit" className="btn-primary-full">
             {activeTab === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </button>

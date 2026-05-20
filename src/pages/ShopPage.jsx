@@ -1,16 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ProductGrid from '../components/ProductGrid';
-import { products as initialProducts } from '../data/products';
 
-function ShopPage({ cart, addToCart }) {
+function ShopPage({ cart, addToCart, products }) {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('todos');
+  const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'todos');
   const [priceRange, setPriceRange] = useState(3000);
+
+  useEffect(() => {
+    if (location.state?.category) {
+      setSelectedCategory(location.state.category);
+    }
+  }, [location.state?.category]);
 
   // Filter products based on search, category, and price
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter(product => {
+    return products.filter(product => {
       // Category filter
       const matchesCategory = selectedCategory === 'todos' || product.category === selectedCategory;
       
@@ -23,7 +30,7 @@ function ShopPage({ cart, addToCart }) {
 
       return matchesCategory && matchesSearch && matchesPrice;
     });
-  }, [searchQuery, selectedCategory, priceRange]);
+  }, [searchQuery, selectedCategory, priceRange, products]);
 
   const handleAddToCart = (product) => {
     addToCart(product);

@@ -5,6 +5,12 @@ import { ShoppingBag, User, ChevronLeft } from 'lucide-react';
 const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Hide the storefront header on the admin dashboard
+  if (location.pathname === '/admin') {
+    return null;
+  }
+
   const showBack = location.pathname !== '/';
 
   return (
@@ -17,12 +23,11 @@ const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
         )}
         <Link to="/" className="brand-link-light">
           <img src="/logo.png" alt="Shop Trendy Logo" className="brand-logo" onError={(e) => {
-            // Fallback just in case logo.png is not placed yet
             e.target.style.display = 'none';
             e.target.nextSibling.style.display = 'flex';
           }} />
           <div className="logo-circle-fallback-light" style={{ display: 'none' }}>ST</div>
-          <span className="brand-text-light">ShopTRENDY</span>
+          <span className="brand-text-light">Shop-Trendy</span>
         </Link>
       </div>
 
@@ -31,7 +36,7 @@ const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
         <Link to="/shop" className="nav-link-light">Catálogo</Link>
         <Link to="/about" className="nav-link-light">Nosotros</Link>
       </nav>
-      
+
       <div className="header-right">
         <button className="icon-btn-minimal" aria-label="Mi Perfil" onClick={onUserIconClick}>
           <User size={22} strokeWidth={1.5} />
