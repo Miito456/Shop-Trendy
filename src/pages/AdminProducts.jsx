@@ -3,23 +3,47 @@ import { Search, Plus, Pencil, Trash2, X, ShoppingBag, ImagePlus, Box, ChevronDo
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
-const initialProducts = [
-  { id: 1, nombre: 'Vestido Elegante de Noche', descripcion: 'Vestido elegante perfecto para ocasiones especiales', categoria: 'Ropa Mujer', precio: 129.99, stock: 15, imagen: 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100' },
-  { id: 2, nombre: 'Camisa Casual Hombre', descripcion: 'Camisa casual de algodón premium para el día a día', categoria: 'Ropa Hombre', precio: 49.99, stock: 28, imagen: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=100' },
-  { id: 3, nombre: 'Bolso de Diseñador', descripcion: 'Bolso de cuero genuino con acabados de lujo', categoria: 'Accesorios', precio: 199.99, stock: 8, imagen: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=100' },
-  { id: 4, nombre: 'Zapatillas Deportivas', descripcion: 'Zapatillas cómodas con estilo urbano moderno', categoria: 'Calzado', precio: 89.99, stock: 42, imagen: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100' },
+const categorias = [
+  { slug: 'ropa-mujer', label: 'Ropa Mujer' },
+  { slug: 'ropa-hombre', label: 'Ropa Hombre' },
+  { slug: 'accesorios', label: 'Accesorios' },
+  { slug: 'calzado', label: 'Calzado' },
 ];
 
-const categorias = ['Ropa Mujer', 'Ropa Hombre', 'Accesorios', 'Calzado'];
+const categoryLabels = {
+  'ropa-mujer': 'Ropa Mujer',
+  'ropa-hombre': 'Ropa Hombre',
+  'accesorios': 'Accesorios',
+  'calzado': 'Calzado',
+  'Ropa Mujer': 'Ropa Mujer',
+  'Ropa Hombre': 'Ropa Hombre',
+  'Accesorios': 'Accesorios',
+  'Calzado': 'Calzado',
+};
+
+const categorySlugs = {
+  'Ropa Mujer': 'ropa-mujer',
+  'Ropa Hombre': 'ropa-hombre',
+  'Accesorios': 'accesorios',
+  'Calzado': 'calzado',
+  'ropa-mujer': 'ropa-mujer',
+  'ropa-hombre': 'ropa-hombre',
+  'accesorios': 'accesorios',
+  'calzado': 'calzado',
+};
 
 const categoryColors = {
+  'ropa-mujer': { background: '#fce7f3', color: '#be185d' },
+  'ropa-hombre': { background: '#dbeafe', color: '#1d4ed8' },
+  'accesorios': { background: '#dcfce7', color: '#15803d' },
+  'calzado': { background: '#fef9c3', color: '#854d0e' },
   'Ropa Mujer': { background: '#fce7f3', color: '#be185d' },
   'Ropa Hombre': { background: '#dbeafe', color: '#1d4ed8' },
   'Accesorios': { background: '#dcfce7', color: '#15803d' },
   'Calzado': { background: '#fef9c3', color: '#854d0e' },
 };
 
-const emptyForm = { nombre: '', precio: '', stock: '', categoria: 'Ropa Mujer', descripcion: '', imagen: null, imagenPreview: null };
+const emptyForm = { title: '', price: '', stock: '', category: 'ropa-mujer', description: '', imagen: null, imagenPreview: null };
 
 function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, handleImageChange }) {
   return (
@@ -29,8 +53,8 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
         <input
           style={styles.input}
           placeholder="Ej: Vestido Elegante"
-          value={form.nombre}
-          onChange={e => setForm(prev => ({ ...prev, nombre: e.target.value }))}
+          value={form.title}
+          onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
         />
       </div>
 
@@ -42,8 +66,8 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
             type="number"
             placeholder="0.00"
             min="0"
-            value={form.precio}
-            onChange={e => setForm(prev => ({ ...prev, precio: e.target.value }))}
+            value={form.price}
+            onChange={e => setForm(prev => ({ ...prev, price: e.target.value }))}
           />
         </div>
         <div style={{ ...styles.formGroup, flex: 1 }}>
@@ -64,10 +88,10 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
           <label style={styles.label}>Categoría</label>
           <select
             style={styles.select}
-            value={form.categoria}
-            onChange={e => setForm(prev => ({ ...prev, categoria: e.target.value }))}
+            value={form.category}
+            onChange={e => setForm(prev => ({ ...prev, category: e.target.value }))}
           >
-            {categorias.map(c => <option key={c} value={c}>{c}</option>)}
+            {categorias.map(c => <option key={c.slug} value={c.slug}>{c.label}</option>)}
           </select>
         </div>
         <div style={{ ...styles.formGroup, flex: 1 }}>
@@ -100,16 +124,15 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
         <textarea
           style={styles.textarea}
           placeholder="Describe el producto..."
-          value={form.descripcion}
-          onChange={e => setForm(prev => ({ ...prev, descripcion: e.target.value }))}
+          value={form.description}
+          onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
         />
       </div>
     </>
   );
 }
 
-function AdminProducts() {
-  const [products, setProducts] = useState(initialProducts);
+function AdminProducts({ products = [], setProducts }) {
   const [search, setSearch] = useState('');
   const [filtro, setFiltro] = useState('Todas las categorías');
   const [filtroOpen, setFiltroOpen] = useState(false);
@@ -121,9 +144,10 @@ function AdminProducts() {
   const editFileInputRef = useRef(null);
 
   const filtered = products.filter(p => {
-    const matchSearch = p.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      p.descripcion.toLowerCase().includes(search.toLowerCase());
-    const matchFiltro = filtro === 'Todas las categorías' || p.categoria === filtro;
+    const titleMatch = (p.title || '').toLowerCase().includes(search.toLowerCase());
+    const descMatch = (p.description || '').toLowerCase().includes(search.toLowerCase());
+    const matchSearch = titleMatch || descMatch;
+    const matchFiltro = filtro === 'Todas las categorías' || p.category === categorySlugs[filtro];
     return matchSearch && matchFiltro;
   });
 
@@ -138,22 +162,24 @@ function AdminProducts() {
   };
 
   const handleCreate = () => {
-    if (!form.nombre.trim() || !form.precio || !form.stock || !form.descripcion.trim()) {
+    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
       alert('Por favor completa todos los campos obligatorios: Nombre, Precio, Stock y Descripción.');
       return;
     }
-    if (parseFloat(form.precio) < 0 || parseInt(form.stock) < 0) {
+    if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
       alert('No se permiten cantidades negativas en precio o stock.');
       return;
     }
+    const stockVal = parseInt(form.stock) || 0;
     const newProduct = {
       id: Date.now(),
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      categoria: form.categoria,
-      precio: parseFloat(form.precio) || 0,
-      stock: parseInt(form.stock) || 0,
-      imagen: form.imagenPreview || 'https://via.placeholder.com/100',
+      title: form.title,
+      description: form.description,
+      category: form.category,
+      price: parseFloat(form.price) || 0,
+      stock: stockVal,
+      isSoldOut: stockVal <= 0,
+      image: form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100',
     };
     setProducts(prev => [...prev, newProduct]);
     setForm(emptyForm);
@@ -162,35 +188,38 @@ function AdminProducts() {
 
   const handleEdit = (product) => {
     setEditId(product.id);
+    const stockVal = product.stock !== undefined ? product.stock : (product.isSoldOut ? 0 : 10);
     setForm({
-      nombre: product.nombre,
-      precio: product.precio,
-      stock: product.stock,
-      categoria: product.categoria,
-      descripcion: product.descripcion,
+      title: product.title || '',
+      price: product.price || '',
+      stock: stockVal,
+      category: product.category || 'ropa-mujer',
+      description: product.description || '',
       imagen: null,
-      imagenPreview: product.imagen,
+      imagenPreview: product.image || '',
     });
     setShowEdit(true);
   };
 
   const handleUpdate = () => {
-    if (!form.nombre.trim() || !form.precio || !form.stock || !form.descripcion.trim()) {
+    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
       alert('Por favor completa todos los campos obligatorios: Nombre, Precio, Stock y Descripción.');
       return;
     }
-    if (parseFloat(form.precio) < 0 || parseInt(form.stock) < 0) {
+    if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
       alert('No se permiten cantidades negativas en precio o stock.');
       return;
     }
+    const stockVal = parseInt(form.stock) || 0;
     setProducts(prev => prev.map(p => p.id === editId ? {
       ...p,
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      categoria: form.categoria,
-      precio: parseFloat(form.precio) || 0,
-      stock: parseInt(form.stock) || 0,
-      imagen: form.imagenPreview || p.imagen,
+      title: form.title,
+      description: form.description,
+      category: form.category,
+      price: parseFloat(form.price) || 0,
+      stock: stockVal,
+      isSoldOut: stockVal <= 0,
+      image: form.imagenPreview || p.image,
     } : p));
     setForm(emptyForm);
     setShowEdit(false);
@@ -238,7 +267,7 @@ function AdminProducts() {
             </button>
             {filtroOpen && (
               <div style={styles.filtroMenu}>
-                {['Todas las categorías', ...categorias].map(op => (
+                {['Todas las categorías', ...categorias.map(c => c.label)].map(op => (
                   <div key={op} style={styles.filtroItem} onClick={() => { setFiltro(op); setFiltroOpen(false); }}>
                     {op}
                   </div>
@@ -250,30 +279,35 @@ function AdminProducts() {
 
         {/* Products List */}
         <div style={styles.card}>
-          {filtered.map((product, i) => (
-            <div key={product.id} style={{ ...styles.productRow, borderBottom: i < filtered.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
-              <img src={product.imagen} alt={product.nombre} style={styles.productImg} onError={e => e.target.src = 'https://via.placeholder.com/80'} />
-              <div style={styles.productInfo}>
-                <div style={styles.productName}>{product.nombre}</div>
-                <div style={styles.productDesc}>{product.descripcion}</div>
-                <div style={styles.productTags}>
-                  <span style={{ ...styles.categoryBadge, ...categoryColors[product.categoria] }}>{product.categoria}</span>
-                  <span style={{ ...styles.stockBadge, ...(product.stock < 10 ? styles.stockLow : styles.stockOk) }}>
-                    Stock: {product.stock}
-                  </span>
+          {filtered.map((product, i) => {
+            const displayCategory = categoryLabels[product.category] || product.category;
+            const displayColor = categoryColors[product.category] || categoryColors['ropa-mujer'];
+            const productStock = product.stock !== undefined ? product.stock : (product.isSoldOut ? 0 : 10);
+            return (
+              <div key={product.id} style={{ ...styles.productRow, borderBottom: i < filtered.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                <img src={product.image} alt={product.title} style={styles.productImg} onError={e => e.target.src = 'https://via.placeholder.com/80'} />
+                <div style={styles.productInfo}>
+                  <div style={styles.productName}>{product.title}</div>
+                  <div style={styles.productDesc}>{product.description}</div>
+                  <div style={styles.productTags}>
+                    <span style={{ ...styles.categoryBadge, ...displayColor }}>{displayCategory}</span>
+                    <span style={{ ...styles.stockBadge, ...(productStock < 5 ? styles.stockLow : styles.stockOk) }}>
+                      Stock: {productStock}
+                    </span>
+                  </div>
+                </div>
+                <div style={styles.productPrice}>${product.price.toFixed(2)}</div>
+                <div style={styles.productActions}>
+                  <button style={styles.btnEdit} onClick={() => handleEdit(product)}>
+                    <Pencil size={15} />
+                  </button>
+                  <button style={styles.btnDelete} onClick={() => handleDelete(product.id)}>
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               </div>
-              <div style={styles.productPrice}>${product.precio.toFixed(2)}</div>
-              <div style={styles.productActions}>
-                <button style={styles.btnEdit} onClick={() => handleEdit(product)}>
-                  <Pencil size={15} />
-                </button>
-                <button style={styles.btnDelete} onClick={() => handleDelete(product.id)}>
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 
