@@ -14,12 +14,14 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminOrders from './pages/AdminOrders';
+import { products as initialProducts } from './data/products';
 import './index.css';
 
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
 
+  const [products, setProducts] = useState(initialProducts);
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -78,11 +80,11 @@ function AppContent() {
       
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/shop" element={<ShopPage cart={cart} addToCart={addToCart} />} />
-        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} />} />
+        <Route path="/shop" element={<ShopPage cart={cart} addToCart={addToCart} products={products} />} />
+        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} products={products} />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/productos" element={<AdminProducts />} />
+        <Route path="/admin/productos" element={<AdminProducts products={products} setProducts={setProducts} />} />
         <Route path="/admin/pedidos" element={<AdminOrders />} />
         <Route path="/admin/usuarios" element={<AdminUsers />} />
       </Routes>
