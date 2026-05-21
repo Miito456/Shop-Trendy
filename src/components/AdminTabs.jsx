@@ -1,10 +1,10 @@
 import React from 'react';
-import { LayoutDashboard, ShoppingBag, ClipboardList, Users } from 'lucide-react';
+import { LayoutDashboard, Package, ClipboardList, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} />, path: '/admin/dashboard' },
-  { id: 'productos', label: 'Productos', icon: <ShoppingBag size={16} />, path: '/admin/productos' },
+  { id: 'productos', label: 'Productos', icon: <Package size={16} />, path: '/admin/productos' },
   { id: 'pedidos', label: 'Pedidos', icon: <ClipboardList size={16} />, path: '/admin/pedidos' },
   { id: 'usuarios', label: 'Usuarios', icon: <Users size={16} />, path: '/admin/usuarios' },
 ];
