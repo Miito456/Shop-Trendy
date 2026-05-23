@@ -143,7 +143,7 @@ const styles = {
     margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '20px',
   },
   statsGrid: {
     display: 'grid',

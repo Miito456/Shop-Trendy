@@ -36,7 +36,7 @@ function AdminTabs({ activeTab }) {
 const styles = {
   tabsWrapper: {
     background: '#ffffff',
-    padding: '16px 32px 0',
+    padding: '16px 50px 0',
     borderBottom: '1px solid #e8e8e8',
     /*position: 'sticky',
     top: 73,
@@ -44,9 +44,9 @@ const styles = {
   },
   tabs: {
     display: 'flex',
-    gap: '4px',
+    gap: '10px',
     background: '#f5f5f5',
-    padding: '6px',
+    //padding: '6px',
     borderRadius: '12px',
     width: 'fit-content',
   },
@@ -59,8 +59,8 @@ const styles = {
     border: 'none',
     background: 'transparent',
     color: '#666',
-    fontSize: '14px',
-    fontWeight: '500',
+    fontSize: '12px',
+    fontWeight: '600',
     cursor: 'pointer',
   },
   tabBtnActive: {

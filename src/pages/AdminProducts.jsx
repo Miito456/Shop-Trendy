@@ -181,7 +181,8 @@ function AdminProducts({ products = [], setProducts }) {
       isSoldOut: stockVal <= 0,
       image: form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100',
     };
-    setProducts(prev => [...prev, newProduct]);
+    setProducts(prev => [newProduct, ...prev]);
+    alert('¡Producto agregado con éxito!');
     setForm(emptyForm);
     setShowNew(false);
   };
@@ -227,6 +228,7 @@ function AdminProducts({ products = [], setProducts }) {
   };
 
   const handleDelete = (id) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
     setProducts(prev => prev.filter(p => p.id !== id));
   };
 
@@ -246,7 +248,7 @@ function AdminProducts({ products = [], setProducts }) {
             </div>
           </div>
           <button style={styles.btnNew} onClick={() => { setForm(emptyForm); setShowNew(true); }}>
-            <Plus size={16} /> Nuevo Producto
+            <Plus size={14} /> Nuevo Producto
           </button>
         </div>
 
@@ -370,6 +372,8 @@ const styles = {
   },
   content: {
     padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
@@ -383,7 +387,7 @@ const styles = {
   },
   titleLeft: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: '12px',
   },
   title: {
@@ -394,8 +398,9 @@ const styles = {
   },
   subtitle: {
     fontSize: '13px',
+    fontWeight: '500',
     color: '#888',
-    margin: '4px 0 0',
+    //margin: '4px 0 0',
   },
   btnNew: {
     display: 'flex',
@@ -406,7 +411,7 @@ const styles = {
     color: '#fff',
     border: 'none',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     fontWeight: '600',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -421,15 +426,16 @@ const styles = {
     padding: '10px 16px',
   },
   searchInput: {
-    border: 'none',
+    border:  'none',
     outline: 'none',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     width: '100%',
     background: 'transparent',
   },
   filtroWrapper: {
     position: 'relative',
+    display: 'flex',
   },
   filtroBtn: {
     display: 'flex',
@@ -439,7 +445,7 @@ const styles = {
     background: '#fff',
     border: '1.5px solid #e8e8e8',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -458,7 +464,7 @@ const styles = {
   },
   filtroItem: {
     padding: '10px 16px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
   },

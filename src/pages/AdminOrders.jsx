@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, X, MapPin, Calendar, ShoppingBag, Filter, ChevronDown } from 'lucide-react';
+import { Search, Eye, X, MapPin, Calendar, ClipboardList, Filter, ChevronDown, CheckCircle, Clock, Settings, XCircle } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
@@ -21,10 +21,10 @@ const statusStyles = {
 };
 
 const statusIcons = {
-  Completado: '✅',
-  Pendiente: '🕐',
-  Procesando: '⚙️',
-  Cancelado: '❌',
+  Completado: <CheckCircle size={16} color="#16a34a" />,
+  Pendiente: <Clock size={16} color="#ca8a04" />,
+  Procesando: <Settings size={16} color="#2563eb" />,
+  Cancelado: <XCircle size={16} color="#dc2626" />,
 };
 
 function AdminOrders() {
@@ -44,6 +44,13 @@ function AdminOrders() {
   });
 
   const updateStatus = (id, newStatus) => {
+    let mensaje = '';
+    if (newStatus === 'Procesando') mensaje = '¿Marcar este pedido como Procesando?';
+    else if (newStatus === 'Completado') mensaje = '¿Marcar este pedido como Completado?';
+    else if (newStatus === 'Cancelado') mensaje = '¿Estás seguro de que deseas cancelar este pedido?';
+
+    if (!window.confirm(mensaje)) return;
+
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
     if (selectedOrder?.id === id) {
       setSelectedOrder(prev => ({ ...prev, status: newStatus }));
@@ -58,7 +65,7 @@ function AdminOrders() {
       <main style={styles.content}>
         {/* Title */}
         <div style={styles.titleRow}>
-          <ShoppingBag size={22} color="#e08c00" />
+          <ClipboardList size={22} color="#e08c00" />
           <div>
             <h2 style={styles.title}>Gestión de Pedidos</h2>
             <p style={styles.subtitle}>Administra y monitorea todos los pedidos de la tienda</p>
@@ -66,8 +73,8 @@ function AdminOrders() {
         </div>
 
         {/* Search & Filter */}
-        <div style={styles.searchRow}>
-          <div style={styles.searchBox}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ ...styles.searchBox, flex: 1 }}>
             <Search size={16} color="#aaa" />
             <input
               style={styles.searchInput}
@@ -100,7 +107,8 @@ function AdminOrders() {
               {/* Icon + Info */}
               <div style={styles.orderLeft}>
                 <div style={{ ...styles.orderIcon, background: statusStyles[order.status].background }}>
-                  <span style={{ fontSize: '18px' }}>{statusIcons[order.status]}</span>
+                  {/*<span style={{ fontSize: '18px' }}>{statusIcons[order.status]}</span>*/}
+                  {statusIcons[order.status]}
                 </div>
                 <div style={styles.orderInfo}>
                   <div style={styles.orderIdRow}>
@@ -253,13 +261,15 @@ const styles = {
   },
   content: {
     padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
   },
   titleRow: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: '12px',
   },
   title: {
@@ -270,14 +280,9 @@ const styles = {
   },
   subtitle: {
     fontSize: '13px',
+    fontWeight: '500',
     color: '#888',
-    margin: '4px 0 0',
-  },
-  searchRow: {
-    display: 'flex',
-    gap: '12px',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    //margin: '4px 0 0',
   },
   searchBox: {
     flex: 1,
@@ -293,13 +298,14 @@ const styles = {
   searchInput: {
     border: 'none',
     outline: 'none',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     width: '100%',
     background: 'transparent',
   },
   filtroWrapper: {
     position: 'relative',
+    display: 'flex',
   },
   filtroBtn: {
     display: 'flex',
@@ -309,7 +315,7 @@ const styles = {
     background: '#fff',
     border: '1.5px solid #e8e8e8',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -328,7 +334,7 @@ const styles = {
   },
   filtroItem: {
     padding: '10px 16px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
   },
@@ -353,8 +359,8 @@ const styles = {
     minWidth: '200px',
   },
   orderIcon: {
-    width: '48px',
-    height: '48px',
+    width: '32px',
+    height: '32px',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -389,8 +395,9 @@ const styles = {
   },
   orderStats: {
     display: 'flex',
-    gap: '32px',
+    gap: '60px',
     alignItems: 'center',
+    marginRight: '50px',
   },
   statItem: {
     display: 'flex',
@@ -398,7 +405,7 @@ const styles = {
     gap: '2px',
   },
   statLabel: {
-    fontSize: '11px',
+    fontSize: '12px',
     color: '#aaa',
   },
   statValue: {
@@ -423,34 +430,34 @@ const styles = {
     gap: '6px',
     padding: '7px 14px',
     background: 'transparent',
-    border: '1.5px solid #e8e8e8',
+    border: '1.5px solid #bababa',
     borderRadius: '8px',
-    fontSize: '13px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
   btnProcesar: {
     padding: '7px 14px',
-    background: '#111',
-    border: 'none',
+    background: '#dbeafe',
+    border: '1.5px solid #2563eb',
     borderRadius: '8px',
-    fontSize: '13px',
-    color: '#fff',
+    fontSize: '12px',
+    color: '#2563eb',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    fontWeight: '600',
+    width: '100%',
   },
   btnCompletar: {
     padding: '7px 14px',
-    background: '#16a34a',
-    border: 'none',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
     borderRadius: '8px',
-    fontSize: '13px',
-    color: '#fff',
+    fontSize: '12px',
+    color: '#16a34a',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    fontWeight: '600',
+    width: '100%',
   },
   overlay: {
     position: 'fixed',
@@ -599,30 +606,30 @@ const styles = {
   btnModalProcesar: {
     flex: 1,
     padding: '12px',
-    background: '#111',
-    border: 'none',
+    background: '#dbeafe',
+    border: '1.5px solid #2563eb',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
-    color: '#fff',
+    color: '#2563eb',
     cursor: 'pointer',
   },
   btnModalCompletar: {
     flex: 1,
     padding: '12px',
-    background: '#16a34a',
-    border: 'none',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
-    color: '#fff',
+    color: '#16a34a',
     cursor: 'pointer',
   },
   btnModalCancelar: {
     flex: 1,
     padding: '12px',
-    background: 'transparent',
-    border: '1.5px solid #fca5a5',
+    background: '#fee2e2',
+    border: '1.5px solid #dc2626',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
