@@ -16,9 +16,18 @@ const AdminLogin = ({ isOpen, onClose }) => {
         </button>
 
         {/* Logo */}
-        <div style={styles.logoWrapper}>
+        {/*<div style={styles.logoWrapper}>
           <div style={styles.logo}>
             ST
+          </div>
+        </div>*/}
+        
+        <div style={styles.logoWrapper}>
+          <div style={styles.logo}>
+            <img src="/logo.png" alt="Shop Trendy Logo" className="brand-logo" onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }} />
           </div>
         </div>
 
@@ -50,11 +59,11 @@ const AdminLogin = ({ isOpen, onClose }) => {
         </form>
 
         {/* Credenciales de demostración */}
-        <div style={styles.demoBox}>
+        {/*<div style={styles.demoBox}>
           <p style={styles.demoTitle}>Credenciales de demostración:</p>
           <p style={styles.demoText}>admin@shoptrendy.com</p>
           <p style={styles.demoText}>admin123</p>
-        </div>
+        </div>*/}
 
       </div>
     </div>
@@ -82,7 +91,7 @@ const styles = {
   titleAccent: {
     color: '#e08c00',
   },
-  demoBox: {
+  /*demoBox: {
     marginTop: '16px',
     width: '100%',
     background: '#fffbea',
@@ -102,7 +111,7 @@ const styles = {
     fontWeight: '600',
     margin: '2px 0',
     fontFamily: 'monospace',
-  },
+  },*/
 };
 
 export default AdminLogin;

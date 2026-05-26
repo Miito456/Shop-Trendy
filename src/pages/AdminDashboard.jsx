@@ -1,13 +1,13 @@
 import React from 'react';
-import { ClipboardList, TrendingUp, AlertCircle } from 'lucide-react';
+import { ClipboardList, TrendingUp, AlertCircle, DollarSign, Package, Users } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
 const stats = [
-  { label: 'Ingresos Totales', value: '$45,280.50', change: '+12.5% vs mes anterior', color: '#22c55e', bg: '#dcfce7', icon: '💵' },
-  { label: 'Pedidos', value: '324', change: '+8.2% vs mes anterior', color: '#3b82f6', bg: '#dbeafe', icon: '🛒' },
-  { label: 'Productos', value: '156', change: '+5.1% vs mes anterior', color: '#f97316', bg: '#ffedd5', icon: '📦' },
-  { label: 'Usuarios', value: '1248', change: '+15.3% vs mes anterior', color: '#a855f7', bg: '#f3e8ff', icon: '👥' },
+  { label: 'Ingresos Totales', value: '$45,280.50', change: '+12.5% vs mes anterior', color: '#22c55e', bg: '#dcfce7', icon: <DollarSign size={20} color="#22c55e" /> },
+  { label: 'Pedidos', value: '324', change: '+8.2% vs mes anterior', color: '#3b82f6', bg: '#dbeafe', icon: <ClipboardList size={20} color="#3b82f6" /> },
+  { label: 'Productos', value: '156', change: '+5.1% vs mes anterior', color: '#e08c00', bg: '#ffedd5', icon: <Package size={20} color="#e08c00" /> },
+  { label: 'Usuarios', value: '1248', change: '+15.3% vs mes anterior', color: '#a855f7', bg: '#f3e8ff', icon: <Users size={20} color="#a855f7" /> },
 ];
 
 const recentOrders = [
@@ -58,6 +58,17 @@ function AdminDashboard() {
           ))}
         </div>
 
+        {/* Alerta Stock Bajo */}
+        <div style={styles.alertBox}>
+          <AlertCircle size={24} color="#e08c00" />
+          <div>
+            <div style={styles.alertTitle}>Productos con Stock Bajo</div>
+            <div style={styles.alertText}>
+              Hay 3 productos con menos de 5 unidades en inventario. Revisa la sección de productos para reponer stock.
+            </div>
+          </div>
+        </div>
+
         {/* Pedidos Recientes & Top Productos */}
         <div style={styles.twoCol}>
           <div style={styles.card}>
@@ -105,17 +116,6 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Alerta Stock Bajo */}
-        <div style={styles.alertBox}>
-          <AlertCircle size={20} color="#e08c00" />
-          <div>
-            <div style={styles.alertTitle}>Productos con Stock Bajo</div>
-            <div style={styles.alertText}>
-              Hay 3 productos con menos de 5 unidades en inventario. Revisa la sección de productos para reponer stock.
-            </div>
-          </div>
-        </div>
-
       </main>
 
       <style>{`
@@ -139,9 +139,11 @@ const styles = {
   },
   content: {
     padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '20px',
   },
   statsGrid: {
     display: 'grid',
@@ -165,11 +167,12 @@ const styles = {
   statLabel: {
     fontSize: '13px',
     color: '#888',
+    fontWeight: '500',
   },
   statIconBox: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
+    width: '35px',
+    height: '35px',
+    borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -185,6 +188,27 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
+  },
+  alertBox: {
+    background: '#fffbea',
+    border: '1px solid #f5e4a0',
+    borderRadius: '12px',
+    padding: '16px 24px',
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '12px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+  },
+  alertTitle: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#ad771a',
+    marginBottom: '4px',
+  },
+  alertText: {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: '#e08c00',
   },
   twoCol: {
     display: 'grid',
@@ -242,12 +266,15 @@ const styles = {
     fontSize: '14px',
     fontWeight: '600',
     color: '#1a1a1a',
+    marginRight: '16px',
   },
   statusBadge: {
     padding: '4px 12px',
     borderRadius: '20px',
     fontSize: '12px',
     fontWeight: '500',
+    width: '100px',
+    textAlign: 'center',
   },
   productRow: {
     display: 'flex',
@@ -265,7 +292,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '13px',
+    fontSize: '12px',
     fontWeight: '700',
     flexShrink: 0,
   },
@@ -286,25 +313,7 @@ const styles = {
     fontWeight: '600',
     color: '#e08c00',
   },
-  alertBox: {
-    background: '#fffbea',
-    border: '1px solid #f5e4a0',
-    borderRadius: '12px',
-    padding: '16px 24px',
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-  },
-  alertTitle: {
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#e08c00',
-    marginBottom: '4px',
-  },
-  alertText: {
-    fontSize: '13px',
-    color: '#666',
-  },
+  
 };
 
 export default AdminDashboard;

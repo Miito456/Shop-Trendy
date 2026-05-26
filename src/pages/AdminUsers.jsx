@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, UserX, UserCheck, X, Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, ChevronDown, Filter } from 'lucide-react';
+import { Search, Eye, UserX, Users, UserCheck, X, Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, ChevronDown, Filter } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
@@ -34,6 +34,13 @@ function AdminUsers() {
   });
 
   const toggleStatus = (id) => {
+    const user = users.find(u => u.id === id);
+    const mensaje = user.status === 'Activo' 
+      ? '¿Estás seguro de que deseas Desactivar este usuario?' 
+      : '¿Estás seguro de que deseas Activar este usuario?';
+    
+    if (!window.confirm(mensaje)) return;
+
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: u.status === 'Activo' ? 'Inactivo' : 'Activo' } : u));
     if (selectedUser?.id === id) {
       setSelectedUser(prev => ({ ...prev, status: prev.status === 'Activo' ? 'Inactivo' : 'Activo' }));
@@ -48,7 +55,7 @@ function AdminUsers() {
       <main style={styles.content}>
         {/* Title */}
         <div style={styles.titleRow}>
-          <div style={styles.titleIcon}><UserCheck size={22} color="#e08c00" /></div>
+          <div style={styles.titleIcon}><Users size={22} color="#e08c00" /></div>
           <div>
             <h2 style={styles.title}>Gestión de Usuarios</h2>
             <p style={styles.subtitle}>Administra los usuarios registrados en la plataforma</p>
@@ -56,8 +63,8 @@ function AdminUsers() {
         </div>
 
         {/* Search & Filter */}
-        <div style={styles.searchRow}>
-          <div style={styles.searchBox}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ ...styles.searchBox, flex: 1 }}>
             <Search size={16} color="#aaa" />
             <input
               style={styles.searchInput}
@@ -106,7 +113,7 @@ function AdminUsers() {
               <div style={styles.userStats}>
                 <div style={styles.statItem}>
                   <span style={styles.statLabel}>Pedidos</span>
-                  <div style={styles.statValueRow}><ShoppingBag size={13} color="#e08c00" /> <span style={styles.statNum}>{user.pedidos}</span></div>
+                  <div style={styles.statValueRow}><ShoppingBag size={14} color="#e08c00" /> <span style={styles.statNum}>{user.pedidos}</span></div>
                 </div>
                 <div style={styles.statItem}>
                   <span style={styles.statLabel}>Total Gastado</span>
@@ -233,13 +240,15 @@ const styles = {
   },
   content: {
     padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
   },
   titleRow: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: '12px',
   },
   titleIcon: {
@@ -253,14 +262,9 @@ const styles = {
   },
   subtitle: {
     fontSize: '13px',
+    fontWeight: '500',
     color: '#888',
-    margin: '4px 0 0',
-  },
-  searchRow: {
-    display: 'flex',
-    gap: '12px',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    //margin: '4px 0 0',
   },
   searchBox: {
     flex: 1,
@@ -276,13 +280,14 @@ const styles = {
   searchInput: {
     border: 'none',
     outline: 'none',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     width: '100%',
     background: 'transparent',
   },
   filtroWrapper: {
     position: 'relative',
+    display: 'flex',
   },
   filtroBtn: {
     display: 'flex',
@@ -292,7 +297,7 @@ const styles = {
     background: '#fff',
     border: '1.5px solid #e8e8e8',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -311,7 +316,7 @@ const styles = {
   },
   filtroItem: {
     padding: '10px 16px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
   },
@@ -387,8 +392,9 @@ const styles = {
   },
   userStats: {
     display: 'flex',
-    gap: '32px',
+    gap: '60px',
     alignItems: 'center',
+    marginRight: '50px',
   },
   statItem: {
     display: 'flex',
@@ -396,8 +402,8 @@ const styles = {
     gap: '2px',
   },
   statLabel: {
-    fontSize: '11px',
-    color: '#aaa',
+    fontSize: '12px',
+    color: '#888',
   },
   statValueRow: {
     display: 'flex',
@@ -425,39 +431,43 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     padding: '7px 14px',
-    background: 'transparent',
-    border: '1.5px solid #e8e8e8',
+    background: 'transparent',  
+    border: '1.5px solid #bababa',
     borderRadius: '8px',
-    fontSize: '13px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
   btnDesactivar: {
     display: 'flex',
-    alignItems: 'center',
+    //alignItems: 'center',
+    justifyContent: 'center',
     gap: '6px',
     padding: '7px 14px',
-    background: 'transparent',
-    border: '1.5px solid #fca5a5',
+    background: '#fee2e2',
+    border: '1.5px solid #dc2626',
     borderRadius: '8px',
-    fontSize: '13px',
+    fontSize: '12px',
     color: '#dc2626',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+    width: '100%',
   },
   btnActivar: {
     display: 'flex',
-    alignItems: 'center',
+    //alignItems: 'center',
+    justifyContent: 'center',
     gap: '6px',
     padding: '7px 14px',
-    background: '#16a34a',
-    border: 'none',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
     borderRadius: '8px',
-    fontSize: '13px',
-    color: '#fff',
+    fontSize: '12px',
+    color: '#16a34a',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+    width: '100%',
   },
   overlay: {
     position: 'fixed',
@@ -604,8 +614,8 @@ const styles = {
   btnModalDesactivar: {
     flex: 1,
     padding: '12px',
-    background: 'transparent',
-    border: '1.5px solid #fca5a5',
+    background: '#fee2e2',
+    border: '1.5px solid #dc2626',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
@@ -615,23 +625,23 @@ const styles = {
   btnModalActivar: {
     flex: 1,
     padding: '12px',
-    background: '#16a34a',
-    border: 'none',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
-    color: '#fff',
+    color: '#16a34a',
     cursor: 'pointer',
   },
   btnModalCerrar: {
     flex: 1,
     padding: '12px',
-    background: 'transparent',
-    border: '1.5px solid #e8e8e8',
+    background: '#111',
+    border: 'none',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: '600',
-    color: '#333',
+    color: '#fff',
     cursor: 'pointer',
   },
 };
