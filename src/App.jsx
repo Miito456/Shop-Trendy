@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ShopPage from './pages/ShopPage';
@@ -15,6 +15,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminOrders from './pages/AdminOrders';
 import { products as initialProducts } from './data/products';
+import { supabase } from './lib/supabaseClient';
 import './index.css';
 
 function AppContent() {
@@ -28,6 +29,43 @@ function AppContent() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  // auth state is persisted by Supabase; initialize and subscribe to changes
+  useEffect(() => {
+    let subscription;
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session;
+        if (session?.user) {
+          setUser({
+            name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+            email: session.user.email,
+          });
+        }
+      } catch (err) {
+        console.error('Error obteniendo sesión Supabase:', err);
+      }
+    };
+
+    init();
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          email: session.user.email,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    subscription = data?.subscription;
+
+    return () => {
+      try { subscription?.unsubscribe(); } catch (e) {}
+    };
+  }, []);
 
   const addToCart = (product) => {
     setCart(prevCart => {
@@ -93,16 +131,23 @@ function AppContent() {
         <Footer onAdminClick={() => setIsAdminLoginOpen(true)} />
       )}
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onLogin={(userData) => setUser(userData)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLogin={(userData) => setUser(userData)}
       />
-      <ProfileModal 
-        isOpen={isProfileModalOpen} 
-        onClose={() => setIsProfileModalOpen(false)} 
-        user={user} 
-        onLogout={() => setUser(null)} 
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        user={user}
+        onLogout={async () => {
+          try {
+            await supabase.auth.signOut();
+          } catch (err) {
+            console.error('Error cerrando sesión:', err);
+          }
+          setUser(null);
+        }}
       />
       <CartDrawer 
         isOpen={isCartOpen}
