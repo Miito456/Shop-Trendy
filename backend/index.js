@@ -12,6 +12,10 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());          // Permite que React (puerto 3000) hable con este servidor (puerto 3001)
 app.use(express.json()); // Permite leer datos JSON que envíe el frontend
 
+// Rutas
+const productosRouter = require('./routes/products');
+app.use('/api/productos', productosRouter);
+
 // Ruta de prueba — para verificar que el servidor vive
 app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor de Shop-Trendy funcionando' });
