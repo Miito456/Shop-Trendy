@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ShopPage from './pages/ShopPage';
@@ -14,14 +14,32 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminOrders from './pages/AdminOrders';
-import { products as initialProducts } from './data/products';
+//import { products as initialProducts } from './data/products';
+
 import './index.css';
 
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
+//Llamada a backend
+ // const [products, setProducts] = useState(initialProducts);
+  // DESPUÉS:
+const [products, setProducts] = useState([]);
+const [loadingProducts, setLoadingProducts] = useState(true);
 
-  const [products, setProducts] = useState(initialProducts);
+useEffect(() => {
+  fetch('http://localhost:3001/api/productos')
+    .then(res => res.json())
+    .then(data => {
+      setProducts(data);
+      setLoadingProducts(false);
+    })
+    .catch(err => {
+      console.error('Error cargando productos:', err);
+      setLoadingProducts(false);
+    });
+}, []);
+
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);

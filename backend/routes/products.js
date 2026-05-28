@@ -9,6 +9,13 @@ router.get('/', async (req, res) => {
     const resultado = await pool.query(
       'SELECT * FROM products ORDER BY id ASC'
     );
+
+    // Convertir price a número antes de enviarlo
+    const productos = resultado.rows.map(p => ({
+      ...p,
+      price: parseFloat(p.price)
+    }));
+
     res.json(resultado.rows);
   } catch (error) {
     console.error('Error al obtener productos:', error.message);
@@ -29,6 +36,10 @@ router.get('/:id', async (req, res) => {
     if (resultado.rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
+    const producto = {
+      ...resultado.rows[0],
+      price: parseFloat(resultado.rows[0].price)
+    };
 
     res.json(resultado.rows[0]);
   } catch (error) {
