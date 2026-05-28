@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { Search, Plus, Pencil, Trash2, X, ShoppingBag, ImagePlus, Box, ChevronDown, Filter } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
@@ -151,40 +152,115 @@ function AdminProducts({ products = [], setProducts }) {
     return matchSearch && matchFiltro;
   });
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setForm(prev => ({ ...prev, imagen: file, imagenPreview: ev.target.result }));
-    };
-    reader.readAsDataURL(file);
+  const handleImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validar formato
+  const formatosPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!formatosPermitidos.includes(file.type)) {
+    alert('Solo se permiten imágenes JPG, PNG o WebP');
+    return;
+  }
+
+  // Validar tamaño (2MB máximo)
+  const tamanioMaximo = 2 * 1024 * 1024;
+  if (file.size > tamanioMaximo) {
+    alert('La imagen no puede superar 2MB');
+    return;
+  }
+
+  // Mostrar preview inmediatamente
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    setForm(prev => ({ ...prev, imagenPreview: ev.target.result }));
+  };
+  reader.readAsDataURL(file);
+
+  // Subir a Supabase Storage
+  try {
+    const extension = file.name.split('.').pop();
+    const fileName = `producto-${Math.random().toString(36).substring(2, 9)}.${extension}`;
+
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    // Log temporal para ver la URL exacta
+console.log('URL completa:', `${SUPABASE_URL}/storage/v1/object/products/${fileName}`);
+console.log('Key disponible:', !!SUPABASE_KEY);
+
+    const uploadRes = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/products/${fileName}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'apikey': SUPABASE_KEY,
+          'Content-Type': file.type,
+        },
+        body: file
+      }
+    );
+
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      console.error('Error subiendo imagen:', errText);
+      alert('Error al subir la imagen');
+      return;
+    }
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${fileName}`;
+
+    setForm(prev => ({
+      ...prev,
+      imagen: file,
+      imagenPreview: publicUrl,
+      imageUrl: publicUrl
+    }));
+
+    console.log('Imagen subida:', publicUrl);
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al subir la imagen');
+  }
+};
+
+  const handleCreate = async () => {
+  if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
+    alert('Por favor completa todos los campos obligatorios.');
+    return;
+  }
+  if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
+    alert('No se permiten cantidades negativas.');
+    return;
+  }
+
+  const stockVal = parseInt(form.stock) || 0;
+  const nuevoProducto = {
+    title:       form.title,
+    description: form.description,
+    category:    form.category,
+    price:       parseFloat(form.price) || 0,
+    isSoldOut:   stockVal <= 0,
+    image:       form.imageUrl || form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100'
   };
 
-  const handleCreate = () => {
-    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
-      alert('Por favor completa todos los campos obligatorios: Nombre, Precio, Stock y Descripción.');
-      return;
-    }
-    if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
-      alert('No se permiten cantidades negativas en precio o stock.');
-      return;
-    }
-    const stockVal = parseInt(form.stock) || 0;
-    const newProduct = {
-      id: Date.now(),
-      title: form.title,
-      description: form.description,
-      category: form.category,
-      price: parseFloat(form.price) || 0,
-      stock: stockVal,
-      isSoldOut: stockVal <= 0,
-      image: form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100',
-    };
-    setProducts(prev => [...prev, newProduct]);
+  try {
+    const res = await fetch('http://localhost:3001/api/productos', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(nuevoProducto)
+    });
+    const productoCreado = await res.json();
+    setProducts(prev => [...prev, productoCreado]);
     setForm(emptyForm);
     setShowNew(false);
-  };
+  } catch (error) {
+    console.error('Error creando producto:', error);
+    alert('Error al crear el producto');
+  }
+};
 
   const handleEdit = (product) => {
     setEditId(product.id);
@@ -201,34 +277,52 @@ function AdminProducts({ products = [], setProducts }) {
     setShowEdit(true);
   };
 
-  const handleUpdate = () => {
-    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
-      alert('Por favor completa todos los campos obligatorios: Nombre, Precio, Stock y Descripción.');
-      return;
-    }
-    if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
-      alert('No se permiten cantidades negativas en precio o stock.');
-      return;
-    }
-    const stockVal = parseInt(form.stock) || 0;
-    setProducts(prev => prev.map(p => p.id === editId ? {
-      ...p,
-      title: form.title,
-      description: form.description,
-      category: form.category,
-      price: parseFloat(form.price) || 0,
-      stock: stockVal,
-      isSoldOut: stockVal <= 0,
-      image: form.imagenPreview || p.image,
-    } : p));
+  const handleUpdate = async () => {
+  if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
+    alert('Por favor completa todos los campos obligatorios.');
+    return;
+  }
+
+  const stockVal = parseInt(form.stock) || 0;
+  const productoActualizado = {
+    title:       form.title,
+    description: form.description,
+    category:    form.category,
+    price:       parseFloat(form.price) || 0,
+    isSoldOut:   stockVal <= 0,
+    image:       form.imageUrl || form.imagenPreview || ''
+  };
+
+  try {
+    const res = await fetch(`http://localhost:3001/api/productos/${editId}`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(productoActualizado)
+    });
+    const productoEditado = await res.json();
+    setProducts(prev => prev.map(p => String(p.id) === String(editId) ? productoEditado : p));
     setForm(emptyForm);
     setShowEdit(false);
     setEditId(null);
-  };
+  } catch (error) {
+    console.error('Error actualizando producto:', error);
+    alert('Error al actualizar el producto');
+  }
+};
 
-  const handleDelete = (id) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-  };
+  const handleDelete = async (id) => {
+  if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
+
+  try {
+    await fetch(`http://localhost:3001/api/productos/${id}`, {
+      method: 'DELETE'
+    });
+    setProducts(prev => prev.filter(p => String(p.id) !== String(id)));
+  } catch (error) {
+    console.error('Error eliminando producto:', error);
+    alert('Error al eliminar el producto');
+  }
+};
 
   return (
     <div style={styles.page}>
@@ -296,7 +390,7 @@ function AdminProducts({ products = [], setProducts }) {
                     </span>
                   </div>
                 </div>
-                <div style={styles.productPrice}>${product.price.toFixed(2)}</div>
+                <div style={styles.productPrice}>${parseFloat(product.price).toFixed(2)}</div>
                 <div style={styles.productActions}>
                   <button style={styles.btnEdit} onClick={() => handleEdit(product)}>
                     <Pencil size={15} />
