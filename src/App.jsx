@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from './lib/supabaseClient';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ShopPage from './pages/ShopPage';
@@ -14,31 +15,24 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminOrders from './pages/AdminOrders';
-//import { products as initialProducts } from './data/products';
-
 import './index.css';
 
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
-//Llamada a backend
- // const [products, setProducts] = useState(initialProducts);
-  // DESPUÉS:
-const [products, setProducts] = useState([]);
-const [loadingProducts, setLoadingProducts] = useState(true);
 
-useEffect(() => {
-  fetch('http://localhost:3001/api/productos')
-    .then(res => res.json())
-    .then(data => {
-      setProducts(data);
-      setLoadingProducts(false);
-    })
-    .catch(err => {
-      console.error('Error cargando productos:', err);
-      setLoadingProducts(false);
-    });
-}, []);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/productos')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+      })
+      .catch(err => {
+        console.error('Error cargando productos:', err);
+      });
+  }, []);
 
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
@@ -46,6 +40,43 @@ useEffect(() => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  // auth state is persisted by Supabase; initialize and subscribe to changes
+  useEffect(() => {
+    let subscription;
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session;
+        if (session?.user) {
+          setUser({
+            name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+            email: session.user.email,
+          });
+        }
+      } catch (err) {
+        console.error('Error obteniendo sesión Supabase:', err);
+      }
+    };
+
+    init();
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          email: session.user.email,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    subscription = data?.subscription;
+
+    return () => {
+      try { subscription?.unsubscribe(); } catch (e) {}
+    };
+  }, []);
 
   const addToCart = (product) => {
     setCart(prevCart => {
@@ -111,16 +142,23 @@ useEffect(() => {
         <Footer onAdminClick={() => setIsAdminLoginOpen(true)} />
       )}
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onLogin={(userData) => setUser(userData)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLogin={(userData) => setUser(userData)}
       />
-      <ProfileModal 
-        isOpen={isProfileModalOpen} 
-        onClose={() => setIsProfileModalOpen(false)} 
-        user={user} 
-        onLogout={() => setUser(null)} 
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        user={user}
+        onLogout={async () => {
+          try {
+            await supabase.auth.signOut();
+          } catch (err) {
+            console.error('Error cerrando sesión:', err);
+          }
+          setUser(null);
+        }}
       />
       <CartDrawer 
         isOpen={isCartOpen}
