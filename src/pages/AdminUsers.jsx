@@ -1,20 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Search, Eye, UserX, UserCheck, X, Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, ChevronDown, Filter } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
-const usuarios = [
-  { id: 1, nombre: 'Ana García', email: 'ana.garcia@email.com', desde: '2025-12-15', pedidos: 8, total: '$1249.99', status: 'Activo', telefono: '+34 612 345 678', direccion: 'Calle Mayor 12, Madrid, España' },
-  { id: 2, nombre: 'Carlos Ruiz', email: 'carlos.ruiz@email.com', desde: '2026-01-10', pedidos: 3, total: '$389.97', status: 'Activo', telefono: '+34 623 456 789', direccion: 'Avenida del Sol 45, Barcelona, España' },
-  { id: 3, nombre: 'María López', email: 'maria.lopez@email.com', desde: '2025-11-20', pedidos: 12, total: '$2150.88', status: 'Activo', telefono: '+34 634 567 890', direccion: 'Plaza Central 8, Valencia, España' },
-  { id: 4, nombre: 'Juan Pérez', email: 'juan.perez@email.com', desde: '2026-02-05', pedidos: 5, total: '$679.95', status: 'Activo', telefono: '+34 645 678 901', direccion: 'Calle Real 3, Sevilla, España' },
-  { id: 5, nombre: 'Laura Martínez', email: 'laura.martinez@email.com', desde: '2025-10-30', pedidos: 15, total: '$3299.85', status: 'Activo', telefono: '+34 656 789 012', direccion: 'Avenida Norte 22, Bilbao, España' },
-  { id: 6, nombre: 'David Sánchez', email: 'david.sanchez@email.com', desde: '2026-03-12', pedidos: 2, total: '$259.98', status: 'Activo', telefono: '+34 667 890 123', direccion: 'Calle Sur 7, Málaga, España' },
-  { id: 7, nombre: 'Isabel Fernández', email: 'isabel.fernandez@email.com', desde: '2025-09-15', pedidos: 1, total: '$69.99', status: 'Inactivo', telefono: '+34 678 901 234', direccion: 'Plaza Mayor 1, Zaragoza, España' },
-  { id: 8, nombre: 'Miguel Torres', email: 'miguel.torres@email.com', desde: '2026-01-25', pedidos: 6, total: '$899.94', status: 'Activo', telefono: '+34 689 012 345', direccion: 'Calle Oriente 15, Murcia, España' },
-  { id: 9, nombre: 'Carmen Rodríguez', email: 'carmen.rodriguez@email.com', desde: '2025-12-01', pedidos: 9, total: '$1589.91', status: 'Activo', telefono: '+34 690 123 456', direccion: 'Avenida Central 30, Alicante, España' },
-  { id: 10, nombre: 'Pedro Moreno', email: 'pedro.moreno@email.com', desde: '2026-02-18', pedidos: 4, total: '$549.96', status: 'Activo', telefono: '+34 601 234 567', direccion: 'Calle Poniente 9, Granada, España' },
-];
+
 
 function getInitials(nombre) {
   return nombre.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -24,21 +13,49 @@ function AdminUsers() {
   const [search, setSearch] = useState('');
   const [filtro, setFiltro] = useState('Todos los usuarios');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [users, setUsers] = useState(usuarios);
+  const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  fetch('http://localhost:3001/api/users')
+    .then(res => res.json())
+    .then(data => {
+      setUsers(data);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error('Error cargando usuarios:', err);
+      setLoading(false);
+    });
+}, []);
   const [filtroOpen, setFiltroOpen] = useState(false);
 
   const filtered = users.filter(u => {
-    const matchSearch = u.nombre.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
     const matchFiltro = filtro === 'Todos los usuarios' || u.status === filtro.replace('s', '').replace('Activo', 'Activo').replace('Inactivo', 'Inactivo');
     return matchSearch && (filtro === 'Todos los usuarios' ? true : u.status === (filtro === 'Activos' ? 'Activo' : 'Inactivo'));
   });
 
-  const toggleStatus = (id) => {
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: u.status === 'Activo' ? 'Inactivo' : 'Activo' } : u));
+  const toggleStatus = async (id) => {
+  const usuario = users.find(u => u.id === id);
+  const nuevoStatus = usuario.status === 'Activo' ? 'Inactivo' : 'Activo';
+
+  try {
+    await fetch(`http://localhost:3001/api/users/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: nuevoStatus })
+    });
+
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: nuevoStatus } : u));
     if (selectedUser?.id === id) {
-      setSelectedUser(prev => ({ ...prev, status: prev.status === 'Activo' ? 'Inactivo' : 'Activo' }));
+      setSelectedUser(prev => ({ ...prev, status: nuevoStatus }));
     }
-  };
+  } catch (error) {
+    console.error('Error actualizando status:', error);
+    alert('Error al actualizar el usuario');
+  }
+};
 
   return (
     <div style={styles.page}>
@@ -89,16 +106,16 @@ function AdminUsers() {
               
               {/* Avatar + Info */}
               <div style={styles.userLeft}>
-                <div style={styles.avatar}>{getInitials(user.nombre)}</div>
+                <div style={styles.avatar}>{getInitials(user.name)}</div>
                 <div style={styles.userInfo}>
                   <div style={styles.userNameRow}>
-                    <span style={styles.userName}>{user.nombre}</span>
+                    <span style={styles.userName}>{user.name}</span>
                     <span style={{ ...styles.statusBadge, ...(user.status === 'Activo' ? styles.badgeActivo : styles.badgeInactivo) }}>
                       {user.status}
                     </span>
                   </div>
                   <div style={styles.userMeta}><Mail size={12} /> {user.email}</div>
-                  <div style={styles.userMeta}><Calendar size={12} /> Miembro desde {user.desde}</div>
+                  <div style={styles.userMeta}><Calendar size={12} /> Miembro desde {user.registration_date}</div>
                 </div>
               </div>
 
@@ -143,10 +160,10 @@ function AdminUsers() {
 
             {/* Modal Header */}
             <div style={styles.modalHeader}>
-              <div style={styles.modalAvatar}>{getInitials(selectedUser.nombre)}</div>
+              <div style={styles.modalAvatar}>{getInitials(selectedUser.name)}</div>
               <div>
                 <div style={styles.modalNameRow}>
-                  <span style={styles.modalName}>{selectedUser.nombre}</span>
+                  <span style={styles.modalName}>{selectedUser.name}</span>
                   <span style={{ ...styles.statusBadge, ...(selectedUser.status === 'Activo' ? styles.badgeActivo : styles.badgeInactivo) }}>
                     {selectedUser.status}
                   </span>
@@ -162,13 +179,13 @@ function AdminUsers() {
               <div style={styles.modalSection}>
                 <div style={styles.modalSectionTitle}>Información de Contacto</div>
                 <div style={styles.modalInfoRow}><Mail size={14} color="#e08c00" /> {selectedUser.email}</div>
-                <div style={styles.modalInfoRow}><Phone size={14} color="#e08c00" /> {selectedUser.telefono}</div>
+                <div style={styles.modalInfoRow}><Phone size={14} color="#e08c00" /> {selectedUser.phone}</div>
                 <div style={{...styles.modalSectionTitle, marginTop: '16px'}}>Fecha de Registro</div>
-                <div style={styles.modalInfoRow}><Calendar size={14} color="#e08c00" /> {selectedUser.desde}</div>
+                <div style={styles.modalInfoRow}><Calendar size={14} color="#e08c00" /> {selectedUser.registration_date}</div>
               </div>
               <div style={styles.modalSection}>
                 <div style={styles.modalSectionTitle}>Dirección de Envío</div>
-                <div style={styles.modalInfoRow}><MapPin size={14} color="#e08c00" /> {selectedUser.direccion}</div>
+                <div style={styles.modalInfoRow}><MapPin size={14} color="#e08c00" /> {selectedUser.shipping_address}</div>
               </div>
             </div>
 

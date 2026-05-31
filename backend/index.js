@@ -16,6 +16,9 @@ app.use(express.json()); // Permite leer datos JSON que envíe el frontend
 const productosRouter = require('./routes/products');
 app.use('/api/productos', productosRouter);
 
+const usersRouter = require('./routes/users');
+app.use('/api/users', usersRouter);
+
 // Ruta de prueba — para verificar que el servidor vive
 app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor de Shop-Trendy funcionando' });
