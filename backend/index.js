@@ -19,6 +19,9 @@ app.use('/api/productos', productosRouter);
 const usersRouter = require('./routes/users');
 app.use('/api/users', usersRouter);
 
+const ordersRouter = require('./routes/orders');
+app.use('/api/orders', ordersRouter);
+
 // Ruta de prueba — para verificar que el servidor vive
 app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor de Shop-Trendy funcionando' });

@@ -1,38 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ClipboardList, TrendingUp, AlertCircle } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
-const stats = [
-  { label: 'Ingresos Totales', value: '$45,280.50', change: '+12.5% vs mes anterior', color: '#22c55e', bg: '#dcfce7', icon: '💵' },
-  { label: 'Pedidos', value: '324', change: '+8.2% vs mes anterior', color: '#3b82f6', bg: '#dbeafe', icon: '🛒' },
-  { label: 'Productos', value: '156', change: '+5.1% vs mes anterior', color: '#f97316', bg: '#ffedd5', icon: '📦' },
-  { label: 'Usuarios', value: '1248', change: '+15.3% vs mes anterior', color: '#a855f7', bg: '#f3e8ff', icon: '👥' },
-];
-
-const recentOrders = [
-  { name: 'Ana García', date: '2026-04-21', amount: '$249.99', status: 'Completado' },
-  { name: 'Carlos Ruiz', date: '2026-04-21', amount: '$129.99', status: 'Pendiente' },
-  { name: 'María López', date: '2026-04-20', amount: '$349.99', status: 'Procesando' },
-  { name: 'Juan Pérez', date: '2026-04-20', amount: '$89.99', status: 'Completado' },
-  { name: 'Laura Martínez', date: '2026-04-19', amount: '$199.99', status: 'Procesando' },
-];
-
-const topProducts = [
-  { name: 'Chaqueta de Cuero', sales: '45 ventas', revenue: '$11,249.55' },
-  { name: 'Reloj de Pulsera Luxury', sales: '32 ventas', revenue: '$11,199.68' },
-  { name: 'Vestido Elegante de Noche', sales: '38 ventas', revenue: '$4,939.62' },
-  { name: 'Bolso de Diseñador', sales: '28 ventas', revenue: '$5,599.72' },
-  { name: 'Zapatillas Deportivas', sales: '52 ventas', revenue: '$4,679.48' },
-];
-
 const statusStyles = {
   Completado: { background: '#dcfce7', color: '#16a34a' },
-  Pendiente: { background: '#fef9c3', color: '#ca8a04' },
+  Pendiente:  { background: '#fef9c3', color: '#ca8a04' },
   Procesando: { background: '#dbeafe', color: '#2563eb' },
 };
 
 function AdminDashboard() {
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/orders/stats')
+      .then(res => res.json())
+      .then(data => {
+        setStatsData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error cargando stats:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const statsCards = statsData ? [
+    { label: 'Ingresos Totales', value: `$${parseFloat(statsData.ingresos || 0).toFixed(2)}`, change: 'Total de ventas completadas', color: '#22c55e', bg: '#dcfce7', icon: '💵' },
+    { label: 'Pedidos', value: statsData.pedidos || 0, change: 'Total de pedidos', color: '#3b82f6', bg: '#dbeafe', icon: '🛒' },
+    { label: 'Productos', value: statsData.productos || 0, change: 'Productos en catálogo', color: '#f97316', bg: '#ffedd5', icon: '📦' },
+    { label: 'Usuarios', value: statsData.usuarios || 0, change: 'Usuarios registrados', color: '#a855f7', bg: '#f3e8ff', icon: '👥' },
+  ] : [];
+
+  if (loading) {
+    return (
+      <div style={styles.page}>
+        <AdminHeader />
+        <AdminTabs activeTab="dashboard" />
+        <main style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
+          Cargando dashboard...
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.page}>
       <AdminHeader />
@@ -42,7 +54,7 @@ function AdminDashboard() {
 
         {/* Stats */}
         <div style={styles.statsGrid}>
-          {stats.map((stat, i) => (
+          {statsCards.map((stat, i) => (
             <div key={i} style={styles.statCard}>
               <div style={styles.statTop}>
                 <span style={styles.statLabel}>{stat.label}</span>
@@ -68,40 +80,56 @@ function AdminDashboard() {
                 <div style={styles.cardSub}>Últimos pedidos realizados</div>
               </div>
             </div>
-            {recentOrders.map((order, i) => (
-              <div key={i} style={styles.orderRow}>
-                <div>
-                  <div style={styles.orderName}>{order.name}</div>
-                  <div style={styles.orderDate}>{order.date}</div>
+            {statsData?.recientes?.length > 0 ? (
+              statsData.recientes.map((order, i) => (
+                <div key={order.id} style={styles.orderRow}>
+                  <div>
+                    <div style={styles.orderName}>{order.customer_name}</div>
+                    <div style={styles.orderDate}>{order.date}</div>
+                  </div>
+                  <div style={styles.orderRight}>
+                    <span style={styles.orderAmount}>
+                      ${parseFloat(order.total).toFixed(2)}
+                    </span>
+                    <span style={{ ...styles.statusBadge, ...statusStyles[order.status] }}>
+                      {order.status}
+                    </span>
+                  </div>
                 </div>
-                <div style={styles.orderRight}>
-                  <span style={styles.orderAmount}>{order.amount}</span>
-                  <span style={{ ...styles.statusBadge, ...statusStyles[order.status] }}>
-                    {order.status}
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', color: '#888', padding: '1rem' }}>
+                No hay pedidos aún
               </div>
-            ))}
+            )}
           </div>
 
           <div style={styles.card}>
             <div style={styles.cardHeader}>
               <TrendingUp size={18} color="#e08c00" />
               <div>
-                <div style={styles.cardTitle}>Productos Más Vendidos</div>
-                <div style={styles.cardSub}>Top 5 productos este mes</div>
+                <div style={styles.cardTitle}>Productos en Catálogo</div>
+                <div style={styles.cardSub}>Últimos productos agregados</div>
               </div>
             </div>
-            {topProducts.map((product, i) => (
-              <div key={i} style={styles.productRow}>
-                <div style={styles.productRank}>{i + 1}</div>
-                <div style={styles.productInfo}>
-                  <div style={styles.productName}>{product.name}</div>
-                  <div style={styles.productSales}>{product.sales}</div>
+            {statsData?.ultimosProductos?.length > 0 ? (
+              statsData.ultimosProductos.map((product, i) => (
+                <div key={product.id} style={styles.productRow}>
+                  <div style={styles.productRank}>{i + 1}</div>
+                  <div style={styles.productInfo}>
+                    <div style={styles.productName}>{product.title}</div>
+                    <div style={styles.productSales}>{product.category}</div>
+                  </div>
+                  <div style={styles.productRevenue}>
+                    ${parseFloat(product.price).toFixed(2)}
+                  </div>
                 </div>
-                <div style={styles.productRevenue}>{product.revenue}</div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', color: '#888', padding: '1rem' }}>
+                No hay productos aún
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -109,24 +137,14 @@ function AdminDashboard() {
         <div style={styles.alertBox}>
           <AlertCircle size={20} color="#e08c00" />
           <div>
-            <div style={styles.alertTitle}>Productos con Stock Bajo</div>
+            <div style={styles.alertTitle}>Información del Sistema</div>
             <div style={styles.alertText}>
-              Hay 3 productos con menos de 5 unidades en inventario. Revisa la sección de productos para reponer stock.
+              Tienes {statsData?.productos || 0} productos en catálogo y {statsData?.usuarios || 0} usuarios registrados en la plataforma.
             </div>
           </div>
         </div>
 
       </main>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .two-col { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .stats-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

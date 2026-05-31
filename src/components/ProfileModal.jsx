@@ -8,6 +8,8 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
   const [telefono, setTelefono] = useState(user?.phone || '');
   const [direccion, setDireccion] = useState(user?.address || '');
   const [guardando, setGuardando] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
  useEffect(() => {
     if (isOpen && user) {
@@ -25,6 +27,26 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
       });
     }
   }, [isOpen, user]);
+
+  useEffect(() => {
+  if (activeTab === 'pedidos' && isOpen) {
+    setLoadingOrders(true);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.id) {
+        fetch(`http://localhost:3001/api/orders/user/${session.user.id}`)
+          .then(res => res.json())
+          .then(data => {
+            setOrders(data);
+            setLoadingOrders(false);
+          })
+          .catch(err => {
+            console.error('Error cargando pedidos:', err);
+            setLoadingOrders(false);
+          });
+      }
+    });
+  }
+}, [activeTab, isOpen]);
 
   if (!isOpen || !user) return null;
 
@@ -144,14 +166,47 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
           )}
 
           {activeTab === 'pedidos' && (
-            <div className="tab-pane">
-              <h4 className="tab-pane-title">Historial de Pedidos</h4>
-              <p className="tab-pane-desc">Revisa el estado de tus pedidos</p>
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                Próximamente disponible.
-              </div>
+  <div className="tab-pane">
+    <h4 className="tab-pane-title">Historial de Pedidos</h4>
+    <p className="tab-pane-desc">Revisa el estado de tus pedidos</p>
+
+    {loadingOrders ? (
+      <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+        Cargando pedidos...
+      </div>
+    ) : orders.length === 0 ? (
+      <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+        No tienes pedidos aún.
+      </div>
+    ) : (
+      <div className="orders-list">
+        {orders.map(order => (
+          <div key={order.id} className="order-item">
+            <div className="order-item-left">
+              <h5>Pedido #{order.id}</h5>
+              <span className="order-date">{order.date}</span>
+              <span className="order-items-count">
+                {Array.isArray(order.products) ? order.products.length : 0} artículo(s)
+              </span>
             </div>
-          )}
+            <div className="order-item-right">
+              <span className={`status-badge ${
+                order.status === 'Completado' ? 'badge-success' :
+                order.status === 'Procesando' ? 'badge-info' :
+                order.status === 'Cancelado' ? 'badge-danger' : 'badge-warning'
+              }`}>
+                {order.status}
+              </span>
+              <span className="order-total">
+                ${parseFloat(order.total).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
 
           {activeTab === 'direccion' && (
             <div className="tab-pane">
