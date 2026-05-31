@@ -14,16 +14,13 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
-
-// PUT — actualizar status del usuario
-router.put('/:id/status', async (req, res) => {
+// GET — obtener usuario por ID
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-
     const resultado = await pool.query(
-      'UPDATE users SET status = $1 WHERE id = $2 RETURNING *',
-      [status, id]
+      'SELECT * FROM users WHERE id = $1',
+      [id]
     );
 
     if (resultado.rows.length === 0) {
@@ -32,7 +29,33 @@ router.put('/:id/status', async (req, res) => {
 
     res.json(resultado.rows[0]);
   } catch (error) {
-    console.error('Error al actualizar usuario:', error.message);
+    console.error('Error al obtener usuario:', error.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// PUT — actualizar status del usuario
+// PUT — actualizar perfil del usuario
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone, address } = req.body;
+
+    const resultado = await pool.query(
+      `UPDATE users 
+       SET name = $1, phone = $2, address = $3
+       WHERE id = $4
+       RETURNING *`,
+      [name, phone, address, id]
+    );
+
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json(resultado.rows[0]);
+  } catch (error) {
+    console.error('Error al actualizar perfil:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });

@@ -1,16 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { X, User, Package, MapPin, LogOut } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('perfil');
+  const [nombre, setNombre] = useState(user?.name || '');
+  const [telefono, setTelefono] = useState(user?.phone || '');
+  const [direccion, setDireccion] = useState(user?.address || '');
+  const [guardando, setGuardando] = useState(false);
+
+ useEffect(() => {
+    if (isOpen && user) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) {
+          fetch(`http://localhost:3001/api/users/${session.user.id}`)
+            .then(res => res.json())
+            .then(data => {
+              setNombre(data.name || '');
+              setTelefono(data.phone || '');
+              setDireccion(data.address || '');
+            })
+            .catch(err => console.error('Error cargando perfil:', err));
+        }
+      });
+    }
+  }, [isOpen, user]);
 
   if (!isOpen || !user) return null;
 
-  const mockOrders = [
-    { id: '1001', date: '19 de febrero de 2026', items: 3, total: '249.98', status: 'Entregado' },
-    { id: '1002', date: '24 de febrero de 2026', items: 1, total: '129.99', status: 'En camino' },
-    { id: '1003', date: '26 de febrero de 2026', items: 2, total: '89.99', status: 'Procesando' }
-  ];
+  const handleGuardarPerfil = async () => {
+    setGuardando(true);
+    try {
+      // Obtener el ID del usuario de Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      if (!userId) {
+        alert('No se pudo identificar al usuario');
+        return;
+      }
+
+      await fetch(`http://localhost:3001/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nombre, phone: telefono, address: direccion })
+      });
+
+      alert('Perfil actualizado correctamente');
+    } catch (error) {
+      console.error('Error actualizando perfil:', error);
+      alert('Error al actualizar el perfil');
+    } finally {
+      setGuardando(false);
+    }
+  };
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -42,22 +85,13 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
         </div>
 
         <div className="profile-tabs-nav">
-          <button
-            className={`profile-tab-btn ${activeTab === 'perfil' ? 'active' : ''}`}
-            onClick={() => setActiveTab('perfil')}
-          >
+          <button className={`profile-tab-btn ${activeTab === 'perfil' ? 'active' : ''}`} onClick={() => setActiveTab('perfil')}>
             <User size={16} /> Perfil
           </button>
-          <button
-            className={`profile-tab-btn ${activeTab === 'pedidos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('pedidos')}
-          >
+          <button className={`profile-tab-btn ${activeTab === 'pedidos' ? 'active' : ''}`} onClick={() => setActiveTab('pedidos')}>
             <Package size={16} /> Pedidos
           </button>
-          <button
-            className={`profile-tab-btn ${activeTab === 'direccion' ? 'active' : ''}`}
-            onClick={() => setActiveTab('direccion')}
-          >
+          <button className={`profile-tab-btn ${activeTab === 'direccion' ? 'active' : ''}`} onClick={() => setActiveTab('direccion')}>
             <MapPin size={16} /> Dirección
           </button>
         </div>
@@ -67,24 +101,45 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
             <div className="tab-pane">
               <h4 className="tab-pane-title">Información Personal</h4>
               <p className="tab-pane-desc">Actualiza tu información personal</p>
-
-              <form className="modal-form">
+              <div className="modal-form">
                 <div className="form-group">
                   <label>Nombre Completo</label>
-                  <input type="text" defaultValue={user.name} className="form-input" />
+                  <input
+                    type="text"
+                    value={nombre}
+                    onChange={e => setNombre(e.target.value)}
+                    className="form-input"
+                  />
                 </div>
                 <div className="form-group">
                   <label>Correo Electrónico</label>
-                  <input type="email" defaultValue={user.email} className="form-input" />
+                  <input
+                    type="email"
+                    value={user.email}
+                    className="form-input"
+                    disabled
+                    style={{ opacity: 0.6 }}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Teléfono</label>
-                  <input type="tel" placeholder="+1 234 567 8900" className="form-input" />
+                  <input
+                    type="tel"
+                    placeholder="+1 234 567 8900"
+                    value={telefono}
+                    onChange={e => setTelefono(e.target.value)}
+                    className="form-input"
+                  />
                 </div>
-                <button type="button" className="btn-primary-full mt-4">
-                  Editar Perfil
+                <button
+                  type="button"
+                  className="btn-primary-full mt-4"
+                  onClick={handleGuardarPerfil}
+                  disabled={guardando}
+                >
+                  {guardando ? 'Guardando...' : 'Editar Perfil'}
                 </button>
-              </form>
+              </div>
             </div>
           )}
 
@@ -92,31 +147,35 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
             <div className="tab-pane">
               <h4 className="tab-pane-title">Historial de Pedidos</h4>
               <p className="tab-pane-desc">Revisa el estado de tus pedidos</p>
-
-              <div className="orders-list">
-                {mockOrders.map(order => (
-                  <div key={order.id} className="order-item">
-                    <div className="order-item-left">
-                      <h5>Pedido #{order.id}</h5>
-                      <span className="order-date">{order.date}</span>
-                      <span className="order-items-count">{order.items} artículo{order.items !== 1 ? 's' : ''}</span>
-                    </div>
-                    <div className="order-item-right">
-                      <span className={`status-badge ${getStatusBadgeClass(order.status)}`}>{order.status}</span>
-                      <span className="order-total">${order.total}</span>
-                    </div>
-                  </div>
-                ))}
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                Próximamente disponible.
               </div>
             </div>
           )}
 
           {activeTab === 'direccion' && (
             <div className="tab-pane">
-              <h4 className="tab-pane-title">Direcciones Guardadas</h4>
-              <p className="tab-pane-desc">Administra tus direcciones de envío</p>
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                Aún no tienes direcciones guardadas.
+              <h4 className="tab-pane-title">Dirección de Envío</h4>
+              <p className="tab-pane-desc">Administra tu dirección de envío</p>
+              <div className="modal-form">
+                <div className="form-group">
+                  <label>Dirección</label>
+                  <input
+                    type="text"
+                    placeholder="Calle, número, ciudad..."
+                    value={direccion}
+                    onChange={e => setDireccion(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="btn-primary-full mt-4"
+                  onClick={handleGuardarPerfil}
+                  disabled={guardando}
+                >
+                  {guardando ? 'Guardando...' : 'Guardar Dirección'}
+                </button>
               </div>
             </div>
           )}
