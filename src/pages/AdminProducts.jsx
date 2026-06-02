@@ -254,6 +254,7 @@ console.log('Key disponible:', !!SUPABASE_KEY);
     });
     const productoCreado = await res.json();
     setProducts(prev => [...prev, productoCreado]);
+
     setForm(emptyForm);
     setShowNew(false);
   } catch (error) {
@@ -324,6 +325,7 @@ console.log('Key disponible:', !!SUPABASE_KEY);
   }
 };
 
+
   return (
     <div style={styles.page}>
       <AdminHeader />
@@ -340,7 +342,7 @@ console.log('Key disponible:', !!SUPABASE_KEY);
             </div>
           </div>
           <button style={styles.btnNew} onClick={() => { setForm(emptyForm); setShowNew(true); }}>
-            <Plus size={16} /> Nuevo Producto
+            <Plus size={14} /> Nuevo Producto
           </button>
         </div>
 
@@ -464,6 +466,8 @@ const styles = {
   },
   content: {
     padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
@@ -477,7 +481,7 @@ const styles = {
   },
   titleLeft: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: '12px',
   },
   title: {
@@ -488,8 +492,9 @@ const styles = {
   },
   subtitle: {
     fontSize: '13px',
+    fontWeight: '500',
     color: '#888',
-    margin: '4px 0 0',
+    //margin: '4px 0 0',
   },
   btnNew: {
     display: 'flex',
@@ -500,7 +505,7 @@ const styles = {
     color: '#fff',
     border: 'none',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     fontWeight: '600',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -515,15 +520,16 @@ const styles = {
     padding: '10px 16px',
   },
   searchInput: {
-    border: 'none',
+    border:  'none',
     outline: 'none',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     width: '100%',
     background: 'transparent',
   },
   filtroWrapper: {
     position: 'relative',
+    display: 'flex',
   },
   filtroBtn: {
     display: 'flex',
@@ -533,7 +539,7 @@ const styles = {
     background: '#fff',
     border: '1.5px solid #e8e8e8',
     borderRadius: '10px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
@@ -552,7 +558,7 @@ const styles = {
   },
   filtroItem: {
     padding: '10px 16px',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#333',
     cursor: 'pointer',
   },

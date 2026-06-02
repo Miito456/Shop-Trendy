@@ -8,7 +8,10 @@ function AdminHeader() {
   return (
     <header style={styles.header}>
       <div style={styles.headerLeft}>
-        <div style={styles.logoCircle}>ST</div>
+        <img src="/logo.png" alt="Shop Trendy Logo" className="brand-logo" onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'flex';
+          }} />
         <div>
           <div style={styles.headerTitle}>ShopTRENDY Admin</div>
           <div style={styles.headerSub}>Panel de Administración</div>
@@ -39,18 +42,6 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
   },
-  logoCircle: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    background: '#111',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: '700',
-    fontSize: '14px',
-  },
   headerTitle: {
     fontWeight: '700',
     fontSize: '16px',
@@ -64,12 +55,12 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '10px 20px',
+    padding: '10px 16px',
     background: '#111',
     color: '#fff',
     border: 'none',
     borderRadius: '8px',
-    fontSize: '14px',
+    fontSize: '12px',
     fontWeight: '600',
     cursor: 'pointer',
   },

@@ -61,6 +61,7 @@ function AdminOrders() {
     } catch (error) {
       console.error('Error actualizando status:', error);
       alert('Error al actualizar el pedido');
+
     }
   };
 
@@ -83,7 +84,7 @@ function AdminOrders() {
 
       <main style={styles.content}>
         <div style={styles.titleRow}>
-          <ShoppingBag size={22} color="#e08c00" />
+          <ClipboardList size={22} color="#e08c00" />
           <div>
             <h2 style={styles.title}>Gestión de Pedidos</h2>
             <p style={styles.subtitle}>Administra y monitorea todos los pedidos de la tienda</p>
@@ -92,6 +93,7 @@ function AdminOrders() {
 
         <div style={styles.searchRow}>
           <div style={styles.searchBox}>
+
             <Search size={16} color="#aaa" />
             <input
               style={styles.searchInput}
@@ -135,6 +137,7 @@ function AdminOrders() {
                     </div>
                     <div style={styles.orderMeta}>{order.customer_name}</div>
                     <div style={styles.orderMeta}>{order.customer_email}</div>
+
                   </div>
                 </div>
 
@@ -323,6 +326,7 @@ const styles = {
   btnModalProcesar: { flex: 1, padding: '12px', background: '#111', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
   btnModalCompletar: { flex: 1, padding: '12px', background: '#16a34a', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
   btnModalCancelar: { flex: 1, padding: '12px', background: 'transparent', border: '1.5px solid #fca5a5', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#dc2626', cursor: 'pointer' },
+
 };
 
 export default AdminOrders;
