@@ -27,7 +27,8 @@ const ProductCard = ({ product, onAddToCart }) => {
         
         <div className="product-footer-light">
           <span className="product-price-light">
-            ${product.price.toFixed(2)}
+            ${parseFloat(product.price).toFixed(2)}
+            
           </span>
           <button 
             className="btn-add-light" 

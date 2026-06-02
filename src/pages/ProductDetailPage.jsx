@@ -10,13 +10,30 @@ function ProductDetailPage({ cart, addToCart, products }) {
   const [selectedSize, setSelectedSize] = useState('M');
   const [activeTab, setActiveTab] = useState('description');
 
+
   useEffect(() => {
-    // Scroll to top when loading new product
-    window.scrollTo(0, 0);
-    const foundProduct = products.find(p => p.id === parseInt(id));
+  window.scrollTo(0, 0);
+  
+  
+
+  if (products && products.length > 0) {
+    const foundProduct = products.find(p => String(p.id) === String(id));
+    console.log('producto encontrado:', foundProduct);
     setProduct(foundProduct);
     setQuantity(1);
-  }, [id]);
+  } else {
+    fetch(`http://localhost:3001/api/productos/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('producto del backend:', data);
+        setProduct(data);
+        setQuantity(1);
+      })
+      .catch(err => {
+        console.error('Error cargando producto:', err);
+      });
+  }
+}, [id, products]);
 
   if (!product) {
     return <div className="product-not-found">Producto no encontrado</div>;
@@ -65,7 +82,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
           </div>
 
           <div className="product-price-large">
-            ${product.price.toFixed(2)}
+            ${parseFloat(product.price).toFixed(2)}
           </div>
 
           <p className="product-short-desc">
