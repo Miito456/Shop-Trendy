@@ -28,6 +28,7 @@ const AdminLogin = ({ isOpen, onClose }) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }} />
+            <span style={{ display: 'none' }}>ST</span>
           </div>
         </div>
 
