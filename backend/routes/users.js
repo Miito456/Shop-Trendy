@@ -5,9 +5,16 @@ const pool = require('../db/pool');
 // GET — obtener todos los usuarios
 router.get('/', async (req, res) => {
   try {
-    const resultado = await pool.query(
-      'SELECT * FROM users ORDER BY registration_date DESC'
-    );
+    const resultado = await pool.query(`
+      SELECT 
+        u.*,
+        COUNT(o.id)::integer as total_orders,
+        COALESCE(SUM(o.total), 0)::numeric as total_spent
+      FROM users u
+      LEFT JOIN orders o ON o.user_id = u.id
+      GROUP BY u.id
+      ORDER BY u.registration_date DESC
+    `);
     res.json(resultado.rows);
   } catch (error) {
     console.error('Error al obtener usuarios:', error.message);

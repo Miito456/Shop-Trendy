@@ -135,11 +135,11 @@ useEffect(() => {
               <div style={styles.userStats}>
                 <div style={styles.statItem}>
                   <span style={styles.statLabel}>Pedidos</span>
-                  <div style={styles.statValueRow}><ShoppingBag size={14} color="#e08c00" /> <span style={styles.statNum}>{user.pedidos}</span></div>
+                  <div style={styles.statValueRow}><ShoppingBag size={14} color="#e08c00" /> <span style={styles.statNum}>{user.total_orders || 0}</span></div>
                 </div>
                 <div style={styles.statItem}>
                   <span style={styles.statLabel}>Total Gastado</span>
-                  <span style={styles.statMoney}>{user.total}</span>
+                  <span style={styles.statMoney}>${parseFloat(user.total_spent || 0).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -197,7 +197,7 @@ useEffect(() => {
               </div>
               <div style={styles.modalSection}>
                 <div style={styles.modalSectionTitle}>Dirección de Envío</div>
-                <div style={styles.modalInfoRow}><MapPin size={14} color="#e08c00" /> {selectedUser.shipping_address}</div>
+                <div style={styles.modalInfoRow}><MapPin size={14} color="#e08c00" /> {selectedUser.address || 'No especificada'}</div>
               </div>
             </div>
 
@@ -208,14 +208,14 @@ useEffect(() => {
               <div style={styles.modalStatCard}>
                 <span style={styles.modalStatLabel}>Total Pedidos</span>
                 <div style={styles.modalStatValue}>
-                  <span style={styles.modalStatNum}>{selectedUser.pedidos}</span>
+                  <span style={styles.modalStatNum}>{selectedUser.total_orders || 0}</span>
                   <div style={styles.modalStatIcon}><ShoppingBag size={20} color="#fff" /></div>
                 </div>
               </div>
               <div style={{ ...styles.modalStatCard, background: '#f0fdf4' }}>
                 <span style={styles.modalStatLabel}>Total Gastado</span>
                 <div style={styles.modalStatValue}>
-                  <span style={{ ...styles.modalStatNum, color: '#16a34a' }}>{selectedUser.total}</span>
+                  <span style={{ ...styles.modalStatNum, color: '#16a34a' }}>${parseFloat(selectedUser.total_spent || 0).toFixed(2)}</span>
                   <div style={{ ...styles.modalStatIcon, background: '#16a34a' }}><DollarSign size={20} color="#fff" /></div>
                 </div>
               </div>
