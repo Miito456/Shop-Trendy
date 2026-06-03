@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import { Search, Eye, UserX, UserCheck, X, Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, ChevronDown, Filter } from 'lucide-react';
+import { Search, Eye, UserX, UserCheck, X, Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, ChevronDown, Filter, Users } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
@@ -31,8 +31,7 @@ useEffect(() => {
   const [filtroOpen, setFiltroOpen] = useState(false);
 
   const filtered = users.filter(u => {
-    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
-    const matchFiltro = filtro === 'Todos los usuarios' || u.status === filtro.replace('s', '').replace('Activo', 'Activo').replace('Inactivo', 'Inactivo');
+    const matchSearch = (u.name || '').toLowerCase().includes(search.toLowerCase()) || (u.email || '').toLowerCase().includes(search.toLowerCase());
     return matchSearch && (filtro === 'Todos los usuarios' ? true : u.status === (filtro === 'Activos' ? 'Activo' : 'Inactivo'));
   });
 
@@ -57,6 +56,18 @@ useEffect(() => {
     alert('Error al actualizar el usuario');
   }
 };
+
+  if (loading) {
+    return (
+      <div style={styles.page}>
+        <AdminHeader />
+        <AdminTabs activeTab="usuarios" />
+        <main style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
+          Cargando usuarios...
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.page}>
