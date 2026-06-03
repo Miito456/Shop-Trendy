@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Search, Plus, Pencil, Trash2, X, ShoppingBag, ImagePlus, Box, ChevronDown, Filter } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
@@ -141,8 +141,26 @@ function AdminProducts({ products = [], setProducts }) {
   const [showEdit, setShowEdit] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
+  const [localLoading, setLocalLoading] = useState(false);
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
+
+  // If products haven't been loaded yet (e.g. navigated directly), fetch them
+  useEffect(() => {
+    if (products.length === 0) {
+      setLocalLoading(true);
+      fetch('http://localhost:3001/api/productos')
+        .then(res => res.json())
+        .then(data => {
+          setProducts(data);
+          setLocalLoading(false);
+        })
+        .catch(err => {
+          console.error('Error cargando productos:', err);
+          setLocalLoading(false);
+        });
+    }
+  }, []);
 
   const filtered = products.filter(p => {
     const titleMatch = (p.title || '').toLowerCase().includes(search.toLowerCase());
@@ -325,6 +343,18 @@ console.log('Key disponible:', !!SUPABASE_KEY);
   }
 };
 
+
+  if (localLoading) {
+    return (
+      <div style={styles.page}>
+        <AdminHeader />
+        <AdminTabs activeTab="productos" />
+        <main style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
+          Cargando productos...
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.page}>

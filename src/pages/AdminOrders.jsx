@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, X, MapPin, ShoppingBag, Filter, ChevronDown } from 'lucide-react';
+import { Search, Eye, X, MapPin, ShoppingBag, Filter, ChevronDown, ClipboardList } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
 const statusStyles = {
   Completado: { background: '#dcfce7', color: '#16a34a' },
-  Pendiente:  { background: '#fef9c3', color: '#ca8a04' },
+  Pendiente: { background: '#fef9c3', color: '#ca8a04' },
   Procesando: { background: '#dbeafe', color: '#2563eb' },
-  Cancelado:  { background: '#fee2e2', color: '#dc2626' },
+  Cancelado: { background: '#fee2e2', color: '#dc2626' },
 };
 
 const statusIcons = {
   Completado: '✅',
-  Pendiente:  '🕐',
+  Pendiente: '🕐',
   Procesando: '⚙️',
-  Cancelado:  '❌',
+  Cancelado: '❌',
 };
 
 function AdminOrders() {
-  const [search, setSearch]               = useState('');
-  const [filtro, setFiltro]               = useState('Todos los estados');
-  const [filtroOpen, setFiltroOpen]       = useState(false);
+  const [search, setSearch] = useState('');
+  const [filtro, setFiltro] = useState('Todos los estados');
+  const [filtroOpen, setFiltroOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orders, setOrders]               = useState([]);
-  const [loading, setLoading]             = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('http://localhost:3001/api/orders')
@@ -41,8 +41,8 @@ function AdminOrders() {
   const filtered = orders.filter(o => {
     const matchSearch =
       String(o.id).toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_email.toLowerCase().includes(search.toLowerCase());
+      (o.customer_name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (o.customer_email || '').toLowerCase().includes(search.toLowerCase());
     const matchFiltro = filtro === 'Todos los estados' || o.status === filtro;
     return matchSearch && matchFiltro;
   });
@@ -50,9 +50,9 @@ function AdminOrders() {
   const updateStatus = async (id, newStatus) => {
     try {
       await fetch(`http://localhost:3001/api/orders/${id}/status`, {
-        method:  'PUT',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus })
       });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
       if (selectedOrder?.id === id) {
@@ -269,64 +269,390 @@ function AdminOrders() {
   );
 }
 
-const styles = {
-  page: { minHeight: '100vh', background: '#f5f5f5', fontFamily: "'Segoe UI', sans-serif" },
-  content: { padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' },
-  titleRow: { display: 'flex', alignItems: 'flex-start', gap: '12px' },
-  title: { fontSize: '22px', fontWeight: '700', color: '#1a1a1a', margin: 0 },
-  subtitle: { fontSize: '13px', color: '#888', margin: '4px 0 0' },
-  searchRow: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' },
-  searchBox: { flex: 1, display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1.5px solid #e8e8e8', borderRadius: '10px', padding: '10px 16px', minWidth: '200px' },
-  searchInput: { border: 'none', outline: 'none', fontSize: '14px', color: '#333', width: '100%', background: 'transparent' },
-  filtroWrapper: { position: 'relative' },
-  filtroBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#fff', border: '1.5px solid #e8e8e8', borderRadius: '10px', fontSize: '14px', color: '#333', cursor: 'pointer', whiteSpace: 'nowrap' },
-  filtroMenu: { position: 'absolute', top: '44px', right: 0, background: '#fff', border: '1.5px solid #e8e8e8', borderRadius: '10px', overflow: 'hidden', zIndex: 10, minWidth: '160px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' },
-  filtroItem: { padding: '10px 16px', fontSize: '14px', color: '#333', cursor: 'pointer' },
-  card: { background: '#fff', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' },
-  orderRow: { display: 'flex', alignItems: 'center', padding: '20px 24px', gap: '16px', flexWrap: 'wrap' },
-  orderLeft: { display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '200px' },
-  orderIcon: { width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  orderInfo: { display: 'flex', flexDirection: 'column', gap: '3px' },
-  orderIdRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-  orderId: { fontSize: '14px', fontWeight: '700', color: '#1a1a1a' },
-  statusBadge: { padding: '2px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '600' },
-  orderMeta: { fontSize: '12px', color: '#888' },
-  orderStats: { display: 'flex', gap: '32px', alignItems: 'center' },
-  statItem: { display: 'flex', flexDirection: 'column', gap: '2px' },
-  statLabel: { fontSize: '11px', color: '#aaa' },
-  statValue: { fontSize: '14px', fontWeight: '600', color: '#1a1a1a' },
-  statMoney: { fontSize: '15px', fontWeight: '700', color: '#e08c00' },
-  actions: { display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' },
-  btnDetalle: { display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'transparent', border: '1.5px solid #e8e8e8', borderRadius: '8px', fontSize: '13px', color: '#333', cursor: 'pointer', whiteSpace: 'nowrap' },
-  btnProcesar: { padding: '7px 14px', background: '#111', border: 'none', borderRadius: '8px', fontSize: '13px', color: '#fff', cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: '600' },
-  btnCompletar: { padding: '7px 14px', background: '#16a34a', border: 'none', borderRadius: '8px', fontSize: '13px', color: '#fff', cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: '600' },
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '16px' },
-  modal: { background: '#fff', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '540px', position: 'relative', boxShadow: '0 8px 40px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' },
-  closeBtn: { position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', display: 'flex', alignItems: 'center' },
-  modalHeader: { marginBottom: '4px' },
-  modalTitleRow: { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' },
-  modalTitle: { fontSize: '20px', fontWeight: '700', color: '#1a1a1a' },
-  modalOrderId: { fontSize: '13px', color: '#888', marginTop: '4px' },
-  divider: { border: 'none', borderTop: '1px solid #f0f0f0', margin: '16px 0' },
-  modalBody: { display: 'flex', gap: '24px', flexWrap: 'wrap' },
-  modalSection: { flex: 1, minWidth: '140px', display: 'flex', flexDirection: 'column', gap: '4px' },
-  modalSectionTitle: { fontSize: '12px', fontWeight: '600', color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' },
-  modalClientName: { fontSize: '16px', fontWeight: '600', color: '#1a1a1a' },
-  modalClientEmail: { fontSize: '13px', color: '#888' },
-  modalInfoRow: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  modalAddress: { display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#444' },
-  productRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f9f9f9', borderRadius: '10px', marginTop: '8px' },
-  productName: { fontSize: '14px', fontWeight: '600', color: '#1a1a1a' },
-  productQty: { fontSize: '12px', color: '#888', marginTop: '2px' },
-  productPrice: { fontSize: '14px', fontWeight: '700', color: '#e08c00' },
-  totalRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffbea', borderRadius: '12px', padding: '16px 20px' },
-  totalLabel: { fontSize: '16px', fontWeight: '700', color: '#1a1a1a' },
-  totalValue: { fontSize: '22px', fontWeight: '700', color: '#e08c00' },
-  modalActions: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-  btnModalProcesar: { flex: 1, padding: '12px', background: '#111', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
-  btnModalCompletar: { flex: 1, padding: '12px', background: '#16a34a', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
-  btnModalCancelar: { flex: 1, padding: '12px', background: 'transparent', border: '1.5px solid #fca5a5', borderRadius: '10px', fontSize: '14px', fontWeight: '600', color: '#dc2626', cursor: 'pointer' },
 
+const styles = {
+  page: {
+    minHeight: '100vh',
+    background: '#f5f5f5',
+    fontFamily: "'Segoe UI', sans-serif",
+  },
+  content: {
+    padding: '32px',
+    maxWidth: '1290px',
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  titleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  title: {
+    fontSize: '22px',
+    fontWeight: '700',
+    color: '#1a1a1a',
+    margin: 0,
+  },
+  subtitle: {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: '#888',
+    //margin: '4px 0 0',
+  },
+  searchBox: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    background: '#fff',
+    border: '1.5px solid #e8e8e8',
+    borderRadius: '10px',
+    padding: '10px 16px',
+    minWidth: '200px',
+  },
+  searchInput: {
+    border: 'none',
+    outline: 'none',
+    fontSize: '12px',
+    color: '#333',
+    width: '100%',
+    background: 'transparent',
+  },
+  filtroWrapper: {
+    position: 'relative',
+    display: 'flex',
+  },
+  filtroBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 16px',
+    background: '#fff',
+    border: '1.5px solid #e8e8e8',
+    borderRadius: '10px',
+    fontSize: '12px',
+    color: '#333',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  filtroMenu: {
+    position: 'absolute',
+    top: '44px',
+    right: 0,
+    background: '#fff',
+    border: '1.5px solid #e8e8e8',
+    borderRadius: '10px',
+    overflow: 'hidden',
+    zIndex: 10,
+    minWidth: '160px',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+  },
+  filtroItem: {
+    padding: '10px 16px',
+    fontSize: '12px',
+    color: '#333',
+    cursor: 'pointer',
+  },
+  card: {
+    background: '#fff',
+    borderRadius: '16px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  orderRow: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '20px 24px',
+    gap: '16px',
+    flexWrap: 'wrap',
+  },
+  orderLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '14px',
+    flex: 1,
+    minWidth: '200px',
+  },
+  orderIcon: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  orderInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '3px',
+  },
+  orderIdRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+  },
+  orderId: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  statusBadge: {
+    padding: '2px 10px',
+    borderRadius: '20px',
+    fontSize: '11px',
+    fontWeight: '600',
+  },
+  orderMeta: {
+    fontSize: '12px',
+    color: '#888',
+  },
+  orderStats: {
+    display: 'flex',
+    gap: '60px',
+    alignItems: 'center',
+    marginRight: '50px',
+  },
+  statItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  statLabel: {
+    fontSize: '12px',
+    color: '#aaa',
+  },
+  statValue: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  statMoney: {
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#e08c00',
+  },
+  actions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    alignItems: 'flex-end',
+  },
+  btnDetalle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '7px 14px',
+    background: 'transparent',
+    border: '1.5px solid #bababa',
+    borderRadius: '8px',
+    fontSize: '12px',
+    color: '#333',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  btnProcesar: {
+    padding: '7px 14px',
+    background: '#dbeafe',
+    border: '1.5px solid #2563eb',
+    borderRadius: '8px',
+    fontSize: '12px',
+    color: '#2563eb',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    width: '100%',
+  },
+  btnCompletar: {
+    padding: '7px 14px',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
+    borderRadius: '8px',
+    fontSize: '12px',
+    color: '#16a34a',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    width: '100%',
+  },
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+    padding: '16px',
+  },
+  modal: {
+    background: '#fff',
+    borderRadius: '20px',
+    padding: '32px',
+    width: '100%',
+    maxWidth: '540px',
+    position: 'relative',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#888',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  modalHeader: {
+    marginBottom: '4px',
+  },
+  modalTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  modalTitle: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  modalOrderId: {
+    fontSize: '13px',
+    color: '#888',
+    marginTop: '4px',
+  },
+  divider: {
+    border: 'none',
+    borderTop: '1px solid #f0f0f0',
+    margin: '16px 0',
+  },
+  modalBody: {
+    display: 'flex',
+    gap: '24px',
+    flexWrap: 'wrap',
+  },
+  modalSection: {
+    flex: 1,
+    minWidth: '140px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  modalSectionTitle: {
+    fontSize: '12px',
+    fontWeight: '600',
+    color: '#aaa',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '4px',
+  },
+  modalClientName: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  modalClientEmail: {
+    fontSize: '13px',
+    color: '#888',
+  },
+  modalInfoRow: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  modalAddress: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px',
+    color: '#444',
+  },
+  productRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    background: '#f9f9f9',
+    borderRadius: '10px',
+    marginTop: '8px',
+  },
+  productName: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  productQty: {
+    fontSize: '12px',
+    color: '#888',
+    marginTop: '2px',
+  },
+  productPrice: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#e08c00',
+  },
+  totalRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    background: '#fffbea',
+    borderRadius: '12px',
+    padding: '16px 20px',
+  },
+  totalLabel: {
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  totalValue: {
+    fontSize: '22px',
+    fontWeight: '700',
+    color: '#e08c00',
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  btnModalProcesar: {
+    flex: 1,
+    padding: '12px',
+    background: '#dbeafe',
+    border: '1.5px solid #2563eb',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#2563eb',
+    cursor: 'pointer',
+  },
+  btnModalCompletar: {
+    flex: 1,
+    padding: '12px',
+    background: '#dcfce7',
+    border: '1.5px solid #16a34a',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#16a34a',
+    cursor: 'pointer',
+  },
+  btnModalCancelar: {
+    flex: 1,
+    padding: '12px',
+    background: '#fee2e2',
+    border: '1.5px solid #dc2626',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#dc2626',
+    cursor: 'pointer',
+  },
 };
 
 export default AdminOrders;
