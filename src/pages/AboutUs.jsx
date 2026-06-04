@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Instagram, MessageCircle, MapPin, Clock, Mail } from 'lucide-react';
+import { Phone, Facebook, Instagram, MessageCircle, MapPin, Clock, Mail } from 'lucide-react';
 
 function AboutUs() {
   return (
@@ -10,7 +10,7 @@ function AboutUs() {
         <div style={styles.mapSection}>
           <iframe
             title="Ubicación ShopTRENDY"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.661955009888!2d-99.1332!3d19.4326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDI1JzU3LjQiTiA5OcKwMDcnNTkuNSJX!5e0!3m2!1ses!2smx!4v1620000000000!5m2!1ses!2smx"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3644.655550011344!2d-104.63687188899146!3d24.007937578405897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x869bb78b2349019d%3A0xd525c621787b7c7!2sFrancisco%20Montoya%20M.%20123%2C%20Centauro%20del%20Nte.%2C%2034166%20Durango%2C%20Dgo.!5e0!3m2!1ses!2smx!4v1780470422820!5m2!1ses!2smx"
             style={styles.map}
             allowFullScreen=""
             loading="lazy"
@@ -22,7 +22,10 @@ function AboutUs() {
         <div style={styles.infoSection}>
           
           <div style={styles.logoRow}>
-            <div style={styles.logoCircle}>ST</div>
+            <img src="/logo.png" alt="Shop Trendy Logo" className="brand-logo" onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }} />
             <h1 style={styles.title}>
               Shop
               <span style={styles.titleAccent}>TRENDY</span>
@@ -37,28 +40,31 @@ function AboutUs() {
 
           <div style={styles.infoRow}>
             <MapPin size={18} style={styles.infoIcon} />
-            <span style={styles.infoText}>Av. Ejemplo 123, Ciudad de México, México</span>
+            <span style={styles.infoText}>Francisco Montoya M. 123, Centauro del Nte., 34166 Durango, Dgo., México</span>
           </div>
 
           <div style={styles.infoRow}>
             <Clock size={18} style={styles.infoIcon} />
-            <span style={styles.infoText}>Lun - Sáb: 10:00 AM – 8:00 PM</span>
+            <span style={styles.infoText}>Lun - Vie: 9:00 AM – 9:00 PM</span>
           </div>
 
           <div style={styles.infoRow}>
             <Mail size={18} style={styles.infoIcon} />
-            <span style={styles.infoText}>contacto@shoptrendy.com</span>
+            <span style={styles.infoText}>Pelon1234santos@gmail.com</span>
           </div>
 
           {/* Redes sociales */}
           <div style={styles.socialRow}>
-            <a href="tel:+521234567890" style={styles.socialBtn} title="Teléfono">
+            <a href="tel:+526182611596" style={styles.socialBtn} title="Teléfono">
               <Phone size={22} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" style={styles.socialBtn} title="Instagram">
+            <a href="https://www.facebook.com/share/1D7cZdpLa2/?mibextid=wwXIfr" target="_blank" rel="noreferrer" style={styles.socialBtn} title="Facebook">
+              <Facebook size={22} />
+            </a>
+            <a href="https://www.instagram.com/shop_trendydgo?igsh=MTVsMXk5Y3JtNHVkYQ==" target="_blank" rel="noreferrer" style={styles.socialBtn} title="Instagram">
               <Instagram size={22} />
             </a>
-            <a href="https://wa.me/521234567890" target="_blank" rel="noreferrer" style={styles.socialBtn} title="WhatsApp">
+            <a href="https://wa.me/526182611596" target="_blank" rel="noreferrer" style={styles.socialBtn} title="WhatsApp">
               <MessageCircle size={22} />
             </a>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ClipboardList, TrendingUp, AlertCircle } from 'lucide-react';
+import { ClipboardList, TrendingUp, AlertCircle, DollarSign, Package, Users } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
@@ -7,6 +7,7 @@ const statusStyles = {
   Completado: { background: '#dcfce7', color: '#16a34a' },
   Pendiente:  { background: '#fef9c3', color: '#ca8a04' },
   Procesando: { background: '#dbeafe', color: '#2563eb' },
+  Cancelado:  { background: '#fee2e2', color: '#dc2626' },
 };
 
 function AdminDashboard() {
@@ -27,10 +28,10 @@ function AdminDashboard() {
   }, []);
 
   const statsCards = statsData ? [
-    { label: 'Ingresos Totales', value: `$${parseFloat(statsData.ingresos || 0).toFixed(2)}`, change: 'Total de ventas completadas', color: '#22c55e', bg: '#dcfce7', icon: '💵' },
-    { label: 'Pedidos', value: statsData.pedidos || 0, change: 'Total de pedidos', color: '#3b82f6', bg: '#dbeafe', icon: '🛒' },
-    { label: 'Productos', value: statsData.productos || 0, change: 'Productos en catálogo', color: '#f97316', bg: '#ffedd5', icon: '📦' },
-    { label: 'Usuarios', value: statsData.usuarios || 0, change: 'Usuarios registrados', color: '#a855f7', bg: '#f3e8ff', icon: '👥' },
+    { label: 'Ingresos Totales', value: `$${parseFloat(statsData.ingresos || 0).toFixed(2)}`, change: 'Total de ventas completadas', color: '#22c55e', bg: '#dcfce7', icon: <DollarSign size={20} color="#22c55e" />},
+    { label: 'Pedidos', value: statsData.pedidos || 0, change: 'Total de pedidos', color: '#3b82f6', bg: '#dbeafe', icon: <ClipboardList size={20} color="#3b82f6" />},
+    { label: 'Productos', value: statsData.productos || 0, change: 'Productos en catálogo', color: '#f97316', bg: '#ffedd5', icon: <Package size={20} color="#f97316" />},
+    { label: 'Usuarios', value: statsData.usuarios || 0, change: 'Usuarios registrados', color: '#a855f7', bg: '#f3e8ff', icon: <Users size={20} color="#a855f7" /> },
   ] : [];
 
   if (loading) {
@@ -70,7 +71,7 @@ function AdminDashboard() {
           ))}
         </div>
 
-        {/* Alerta Stock Bajo */}
+        {/* Alerta Stock Bajo
         <div style={styles.alertBox}>
           <AlertCircle size={24} color="#e08c00" />
           <div>
@@ -79,7 +80,7 @@ function AdminDashboard() {
               Hay 3 productos con menos de 5 unidades en inventario. Revisa la sección de productos para reponer stock.
             </div>
           </div>
-        </div>
+        </div>*/}
 
         {/* Pedidos Recientes & Top Productos */}
         <div style={styles.twoCol}>
@@ -144,7 +145,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Alerta Stock Bajo */}
+        {/* Alerta Stock Bajo
         <div style={styles.alertBox}>
           <AlertCircle size={20} color="#e08c00" />
           <div>
@@ -153,7 +154,7 @@ function AdminDashboard() {
               Tienes {statsData?.productos || 0} productos en catálogo y {statsData?.usuarios || 0} usuarios registrados en la plataforma.
             </div>
           </div>
-        </div>
+        </div>*/}
 
       </main>
     </div>
@@ -194,13 +195,13 @@ const styles = {
     alignItems: 'center',
   },
   statLabel: {
-    fontSize: '13px',
+    fontSize: '14px',
     color: '#888',
     fontWeight: '500',
   },
   statIconBox: {
-    width: '35px',
-    height: '35px',
+    width: '34px',
+    height: '34px',
     borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',

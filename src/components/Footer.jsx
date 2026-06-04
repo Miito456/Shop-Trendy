@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, Twitter, Facebook, Mail, X } from 'lucide-react';
+import { Phone, Facebook, Instagram, MessageCircle, Twitter, Mail, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 function Footer({ onAdminClick }) {
@@ -16,7 +16,10 @@ function Footer({ onAdminClick }) {
         <div className="footer-content">
           <div className="footer-brand">
             <div className="logo-container">
-              <div className="logo-circle">ST</div>
+              <img src="/logo.png" alt="Shop Trendy Logo" className="brand-logo" onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }} />
               <span className="logo-text">Shop Trendy</span>
             </div>
             <p className="footer-description">
@@ -24,11 +27,13 @@ function Footer({ onAdminClick }) {
               Calidad y estilo en cada prenda.
             </p>
             <div className="social-links">
-              <a href="#" className="social-icon"><Instagram size={20} /></a>
-              <a href="#" className="social-icon"><Facebook size={20} /></a>
+              <a href="tel:+526182611596" className="social-icon"><Phone size={20} /></a>
+              <a href="https://www.facebook.com/share/1D7cZdpLa2/?mibextid=wwXIfr" className="social-icon"><Facebook size={20} /></a>
+              <a href="https://www.instagram.com/shop_trendydgo?igsh=MTVsMXk5Y3JtNHVkYQ==" className="social-icon"><Instagram size={20} /></a>
+              <a href="https://wa.me/526182611596" className="social-icon"><MessageCircle size={20} /></a>
             </div>
           </div>
-
+    
           <div className="footer-links-group">
             <h4 className="footer-title">Tienda</h4>
             <ul className="footer-links">
