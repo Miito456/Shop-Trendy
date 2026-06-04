@@ -121,21 +121,21 @@ function LandingPage() {
           <div className="store-info-list">
             <div className="store-info-item">
               <strong>Dirección:</strong>
-              <p>Calle Coronado #931, entre Hidalgo y Zaragoza, Zona Centro, Durango, Dgo., México</p>
+              <p>Francisco Montoya M. 123, entre Diego Rivera con esquina en García Márquez, Centauro del Nte., 34166 Durango, Dgo., México</p>
             </div>
             <div className="store-info-item">
               <strong>Horarios:</strong>
-              <p>Lunes a Sábado: 10:00 AM - 8:00 PM<br />Domingo: 11:00 AM - 6:00 PM</p>
+              <p>Lunes a Viernes: 9:00 AM - 9:00 PM</p>
             </div>
             <div className="store-info-item">
               <strong>Contacto:</strong>
-              <p>+52 (618) 123-4567<br />hola@shoptrendy.com</p>
+              <p>+52 (618) 261-1596<br />Pelon1234santos@gmail.com</p>
             </div>
           </div>
         </div>
         <div className="about-map">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14865.224506826!2d-104.6739!3d24.0277!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x869bb85d60ed9043%3A0x2e8d23dd635e62a3!2sCentro%20Hist%C3%B3rico%2C%20Durango%2C%20Dgo.!5e0!3m2!1ses-419!2smx!4v1700000000000!5m2!1ses-419!2smx"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3644.655550011344!2d-104.63687188899146!3d24.007937578405897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x869bb78b2349019d%3A0xd525c621787b7c7!2sFrancisco%20Montoya%20M.%20123%2C%20Centauro%20del%20Nte.%2C%2034166%20Durango%2C%20Dgo.!5e0!3m2!1ses!2smx!4v1780470422820!5m2!1ses!2smx"
             width="100%"
             height="100%"
             style={{ border: 0 }}

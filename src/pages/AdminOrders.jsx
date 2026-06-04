@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, X, MapPin, ShoppingBag, Filter, ChevronDown, ClipboardList } from 'lucide-react';
+import { Search, Eye, X, MapPin, Calendar, ClipboardList, Filter, ChevronDown, CheckCircle, Clock, Settings, XCircle } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import AdminTabs from '../components/AdminTabs';
 
@@ -11,10 +11,10 @@ const statusStyles = {
 };
 
 const statusIcons = {
-  Completado: '✅',
-  Pendiente: '🕐',
-  Procesando: '⚙️',
-  Cancelado: '❌',
+  Completado: <CheckCircle size={20} color="#16a34a" />,
+  Pendiente: <Clock size={20} color="#ca8a04" />,
+  Procesando: <Settings size={20} color="#2563eb" />,
+  Cancelado: <XCircle size={20} color="#dc2626" />,
 };
 
 function AdminOrders() {
@@ -91,9 +91,8 @@ function AdminOrders() {
           </div>
         </div>
 
-        <div style={styles.searchRow}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <div style={styles.searchBox}>
-
             <Search size={16} color="#aaa" />
             <input
               style={styles.searchInput}
@@ -128,7 +127,7 @@ function AdminOrders() {
               <div key={order.id} style={{ ...styles.orderRow, borderBottom: i < filtered.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
                 <div style={styles.orderLeft}>
                   <div style={{ ...styles.orderIcon, background: statusStyles[order.status]?.background || '#f0f0f0' }}>
-                    <span style={{ fontSize: '18px' }}>{statusIcons[order.status] || '📦'}</span>
+                    {statusIcons[order.status]}
                   </div>
                   <div style={styles.orderInfo}>
                     <div style={styles.orderIdRow}>
