@@ -41,6 +41,12 @@ useEffect(() => {
 
   const nuevoStatus = usuario.status === 'Activo' ? 'Inactivo' : 'Activo';
 
+  const mensaje = nuevoStatus === 'Inactivo'
+    ? `¿Desactivar a ${usuario.name}?`
+    : `¿Activar a ${usuario.name}?`;
+
+  if (!window.confirm(mensaje)) return;
+
   try {
     const res = await fetch(`http://localhost:3001/api/users/${id}/status`, {
       method: 'PUT',

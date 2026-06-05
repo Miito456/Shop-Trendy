@@ -50,6 +50,14 @@ function AdminOrders() {
     .sort((a, b) => b.id - a.id);
 
   const updateStatus = async (id, newStatus) => {
+    const mensajes = {
+      Procesando: '¿Marcar este pedido como Procesando?',
+      Completado: '¿Marcar este pedido como Completado?',
+      Cancelado: '¿Estás seguro de que deseas Cancelar este pedido?',
+    };
+
+    if (!window.confirm(mensajes[newStatus])) return;
+
     try {
       await fetch(`http://localhost:3001/api/orders/${id}/status`, {
         method: 'PUT',
