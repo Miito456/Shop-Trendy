@@ -85,11 +85,6 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
           <div className="main-image-container">
             <img src={product.image} alt={product.title} className="main-image" />
           </div>
-          <div className="thumbnail-list">
-            <img src={product.image} alt="thumb 1" className="thumbnail active" />
-            <img src={product.image} alt="thumb 2" className="thumbnail" />
-            <img src={product.image} alt="thumb 3" className="thumbnail" />
-          </div>
         </div>
 
         {/* Right Column: Info */}
@@ -171,12 +166,16 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
           >
             Descripción
           </button>
+
+          {/*}
           <button
             className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
             onClick={() => setActiveTab('details')}
           >
             Detalles
           </button>
+            */}
+
           <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
@@ -195,7 +194,8 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
               </p>
             </>
           )}
-
+          
+          {/*}
           {activeTab === 'details' && (
             <div className="product-details-list">
               <h4>Características Principales</h4>
@@ -208,6 +208,7 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
               </ul>
             </div>
           )}
+            */}
 
           {activeTab === 'reviews' && (
             <div className="product-reviews-list">
