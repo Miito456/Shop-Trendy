@@ -37,19 +37,29 @@ useEffect(() => {
 
   const toggleStatus = async (id) => {
   const usuario = users.find(u => u.id === id);
+  if (!usuario) return;
+
   const nuevoStatus = usuario.status === 'Activo' ? 'Inactivo' : 'Activo';
 
   try {
-    await fetch(`http://localhost:3001/api/users/${id}/status`, {
+    const res = await fetch(`http://localhost:3001/api/users/${id}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: nuevoStatus })
     });
 
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: nuevoStatus } : u));
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al actualizar el usuario');
+    }
+
+    const updatedUser = await res.json();
+    const updatedStatus = updatedUser.status || nuevoStatus;
+
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: updatedStatus } : u));
 
     if (selectedUser?.id === id) {
-      setSelectedUser(prev => ({ ...prev, status: nuevoStatus }));
+      setSelectedUser(prev => ({ ...prev, status: updatedStatus }));
     }
   } catch (error) {
     console.error('Error actualizando status:', error);
