@@ -3,78 +3,7 @@ import { Users, Search, Filter, Eye, UserX, ShoppingBag, Mail } from 'lucide-rea
 import UserDetailsModal from './UserDetailsModal';
 
 const initialUsers = [
-  { 
-    id: 1, 
-    initials: 'AG',
-    name: 'Ana García', 
-    email: 'ana.garcia@email.com',
-    phone: '+34 612 345 678',
-    registrationDate: '2025-12-15',
-    address: 'Calle Principal 123, Madrid, España',
-    totalOrders: 8,
-    totalSpent: 1249.99,
-    status: 'Activo'
-  },
-  { 
-    id: 2, 
-    initials: 'CR',
-    name: 'Carlos Ruiz', 
-    email: 'carlos.ruiz@email.com',
-    phone: '+34 622 111 222',
-    registrationDate: '2026-01-10',
-    address: 'Avenida Libertad 45, Barcelona, España',
-    totalOrders: 3,
-    totalSpent: 389.97,
-    status: 'Activo'
-  },
-  { 
-    id: 3, 
-    initials: 'ML',
-    name: 'María López', 
-    email: 'maria.lopez@email.com',
-    phone: '+34 633 444 555',
-    registrationDate: '2025-11-20',
-    address: 'Plaza Mayor 8, Valencia, España',
-    totalOrders: 12,
-    totalSpent: 2150.88,
-    status: 'Activo'
-  },
-  { 
-    id: 4, 
-    initials: 'JP',
-    name: 'Juan Pérez', 
-    email: 'juan.perez@email.com',
-    phone: '+34 644 777 888',
-    registrationDate: '2026-02-05',
-    address: 'Calle Sol 12, Sevilla, España',
-    totalOrders: 5,
-    totalSpent: 679.95,
-    status: 'Activo'
-  },
-  { 
-    id: 5, 
-    initials: 'LM',
-    name: 'Laura Martínez', 
-    email: 'laura.martinez@email.com',
-    phone: '+34 655 999 000',
-    registrationDate: '2025-10-30',
-    address: 'Gran Vía 100, Bilbao, España',
-    totalOrders: 15,
-    totalSpent: 3299.85,
-    status: 'Activo'
-  },
-  { 
-    id: 6, 
-    initials: 'DS',
-    name: 'David Sánchez', 
-    email: 'david.sanchez@email.com',
-    phone: '+34 666 222 333',
-    registrationDate: '2026-03-12',
-    address: 'Paseo de la Castellana 20, Madrid, España',
-    totalOrders: 2,
-    totalSpent: 259.98,
-    status: 'Activo'
-  }
+  
 ];
 
 const UsersView = () => {
