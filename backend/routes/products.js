@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
       price: parseFloat(p.price)
     }));
 
-    res.json(resultado.rows);
+    res.json(productos);
   } catch (error) {
     console.error('Error al obtener productos:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
       price: parseFloat(resultado.rows[0].price)
     };
 
-    res.json(resultado.rows[0]);
+    res.json(producto);
   } catch (error) {
     console.error('Error al obtener producto:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
