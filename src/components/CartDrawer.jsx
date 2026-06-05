@@ -65,6 +65,8 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
         console.warn('No se pudieron recargar los productos:', e);
       }
       navigate('/shop');
+      // Forzar recarga completa de la página para asegurar que el estado de stock y isSoldOut se refleje
+      window.location.reload();
 
     } catch (error) {
       console.error('Error al finalizar compra:', error);

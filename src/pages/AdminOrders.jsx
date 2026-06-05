@@ -38,14 +38,16 @@ function AdminOrders() {
       });
   }, []);
 
-  const filtered = orders.filter(o => {
-    const matchSearch =
-      String(o.id).toLowerCase().includes(search.toLowerCase()) ||
-      (o.customer_name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (o.customer_email || '').toLowerCase().includes(search.toLowerCase());
-    const matchFiltro = filtro === 'Todos los estados' || o.status === filtro;
-    return matchSearch && matchFiltro;
-  });
+  const filtered = orders
+    .filter(o => {
+      const matchSearch =
+        String(o.id).toLowerCase().includes(search.toLowerCase()) ||
+        (o.customer_name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (o.customer_email || '').toLowerCase().includes(search.toLowerCase());
+      const matchFiltro = filtro === 'Todos los estados' || o.status === filtro;
+      return matchSearch && matchFiltro;
+    })
+    .sort((a, b) => b.id - a.id);
 
   const updateStatus = async (id, newStatus) => {
     try {
@@ -58,10 +60,29 @@ function AdminOrders() {
       if (selectedOrder?.id === id) {
         setSelectedOrder(prev => ({ ...prev, status: newStatus }));
       }
+      // If the order is cancelled, restock its products
+      if (newStatus === 'Cancelado') {
+        const orderRes = await fetch(`http://localhost:3001/api/orders/${id}`);
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          if (Array.isArray(orderData.products)) {
+            for (const p of orderData.products) {
+              // Assuming product ID is p.id or p.productId
+              const productId = p.id || p.productId;
+              await fetch(`http://localhost:3001/api/productos/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ stock: 1, isSoldOut: false })
+              });
+            }
+            // Optionally refresh product list elsewhere
+          }
+        }
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Error actualizando status:', error);
       alert('Error al actualizar el pedido');
-
     }
   };
 
