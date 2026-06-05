@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, StarHalf, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
-function ProductDetailPage({ cart, addToCart, products }) {
+function ProductDetailPage({ cart, addToCart, products, user }) {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -45,6 +45,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
   };
 
   const handleBuyNow = async () => {
+    if (!user) { alert('Debes iniciar sesión para comprar'); return; }
     if (!window.confirm('¿Confirmas la compra de este producto?')) return;
     try {
       const newStock = Math.max(0, (product.stock || 0) - quantity);

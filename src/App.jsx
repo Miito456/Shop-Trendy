@@ -164,7 +164,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/shop" element={<ShopPage cart={cart} addToCart={addToCart} products={products} />} />
-        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} products={products} />} />
+        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} products={products} user={user} />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/productos" element={<AdminProducts products={products} setProducts={setProducts} />} />
