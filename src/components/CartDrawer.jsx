@@ -116,7 +116,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
                         <Minus size={14} />
                       </button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.cartId || item.id, item.quantity + 1)}>
+                      <button onClick={() => updateQuantity(item.cartId || item.id, item.quantity + 1)} disabled={item.quantity >= 1}>
                         <Plus size={14} />
                       </button>
                     </div>

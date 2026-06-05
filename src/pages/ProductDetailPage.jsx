@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, StarHalf, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
@@ -9,6 +9,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('M');
   const [activeTab, setActiveTab] = useState('description');
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -41,6 +42,31 @@ function ProductDetailPage({ cart, addToCart, products }) {
 
   const handleAddToCart = () => {
     addToCart({ ...product, size: selectedSize, quantity });
+  };
+
+  const handleBuyNow = async () => {
+    if (!window.confirm('¿Confirmas la compra de este producto?')) return;
+    try {
+      const newStock = Math.max(0, (product.stock || 0) - quantity);
+      const updatedProduct = {
+        ...product,
+        stock: newStock,
+        isSoldOut: newStock <= 0
+      };
+      const res = await fetch(`http://localhost:3001/api/productos/${product.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProduct)
+      });
+      if (!res.ok) throw new Error('Error actualizando producto');
+      alert('¡Compra realizada con éxito!');
+      // Navigate to catalog and force reload to show updated state
+      navigate('/shop');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error en compra ahora:', error);
+      alert('Error al procesar la compra');
+    }
   };
 
   // Dummy related products (excluding the current one)
@@ -104,7 +130,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
             <button className="btn-add-to-cart" onClick={handleAddToCart} disabled={product.isSoldOut}>
               <ShoppingCart size={18} /> Agregar al Carrito
             </button>
-            <button className="btn-buy-now" disabled={product.isSoldOut}>
+            <button className="btn-buy-now" disabled={product.isSoldOut} onClick={handleBuyNow}>
               Comprar Ahora
             </button>
           </div>
