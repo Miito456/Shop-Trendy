@@ -89,27 +89,14 @@ function ProductDetailPage({ cart, addToCart, products }) {
             {product.description}
           </p>
 
-          <div className="size-selector">
-            <p className="selector-title">Selecciona tu talla</p>
-            <div className="size-options">
-              {['XS', 'S', 'M', 'L', 'XL'].map(size => (
-                <button
-                  key={size}
-                  className={`size-btn ${selectedSize === size ? 'active' : ''}`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
+          
 
           <div className="quantity-selector">
             <p className="selector-title">Cantidad</p>
             <div className="qty-controls">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+              <button onClick={() => setQuantity(Math.max(1))}>-</button>
               <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+              <button onClick={() => setQuantity(1)}>+</button>
             </div>
           </div>
 
@@ -176,10 +163,8 @@ function ProductDetailPage({ cart, addToCart, products }) {
               <h4>Descripción del Producto</h4>
               <p>
                 {product.description}
-                <br /><br />
-                Lorem ipsum dolor sit amet consectetur adipiscing elit malesuada, purus eleifend integer aliquam risus auctor viverra erat metus, maecenas
-                montes mus hendrerit phasellus tellus vehicula. Ultricies aptent malesuada arcu tempus ultrices leo ullamcorper faucibus, bibendum
-                ante nibh scelerisque per nisl eget pellentesque facilisis, mus metus sem laoreet in non a.
+                
+                
               </p>
             </>
           )}

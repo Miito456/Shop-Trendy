@@ -3,63 +3,7 @@ import { Package, Search, Filter, Clock, CheckCircle, Box } from 'lucide-react';
 import OrderDetailsModal from './OrderDetailsModal';
 
 const initialOrders = [
-  { 
-    id: 'ORD-2026-001', 
-    customer: { name: 'Ana García', email: 'ana.garcia@email.com' },
-    date: '2026-04-21', 
-    total: 249.99, 
-    status: 'Completado',
-    shippingAddress: 'Calle Mayor 15, Madrid, España',
-    products: [{ name: 'Chaqueta de Cuero', quantity: 1, price: 249.99 }]
-  },
-  { 
-    id: 'ORD-2026-002', 
-    customer: { name: 'Carlos Ruiz', email: 'carlos.ruiz@email.com' },
-    date: '2026-04-21', 
-    total: 129.99, 
-    status: 'Pendiente',
-    shippingAddress: 'Avenida Libertad 45, Barcelona, España',
-    products: [{ name: 'Vestido Elegante de Noche', quantity: 1, price: 129.99 }]
-  },
-  { 
-    id: 'ORD-2026-003', 
-    customer: { name: 'María López', email: 'maria.lopez@email.com' },
-    date: '2026-04-20', 
-    total: 349.99, 
-    status: 'Procesando',
-    shippingAddress: 'Plaza Mayor 8, Valencia, España',
-    products: [{ name: 'Reloj de Pulsera Luxury', quantity: 1, price: 349.99 }]
-  },
-  { 
-    id: 'ORD-2026-004', 
-    customer: { name: 'Juan Pérez', email: 'juan.perez@email.com' },
-    date: '2026-04-20', 
-    total: 89.99, 
-    status: 'Completado',
-    shippingAddress: 'Calle Sol 12, Sevilla, España',
-    products: [{ name: 'Zapatillas Deportivas', quantity: 1, price: 89.99 }]
-  },
-  { 
-    id: 'ORD-2026-005', 
-    customer: { name: 'Laura Martínez', email: 'laura.martinez@email.com' },
-    date: '2026-04-19', 
-    total: 199.99, 
-    status: 'Procesando',
-    shippingAddress: 'Gran Vía 100, Bilbao, España',
-    products: [{ name: 'Bolso de Diseñador', quantity: 1, price: 199.99 }]
-  },
-  { 
-    id: 'ORD-2026-006', 
-    customer: { name: 'David Sánchez', email: 'david.sanchez@email.com' },
-    date: '2026-04-18', 
-    total: 179.98, 
-    status: 'Completado',
-    shippingAddress: 'Paseo de la Castellana 20, Madrid, España',
-    products: [
-      { name: 'Camisa Casual Hombre', quantity: 2, price: 49.99 },
-      { name: 'Pantalón Vaquero', quantity: 1, price: 80.00 }
-    ]
-  }
+  
 ];
 
 const OrdersView = () => {

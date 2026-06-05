@@ -77,11 +77,7 @@ const DashboardView = () => {
           </div>
           <div className="orders-list">
             {[
-              { name: 'Ana García', date: '2026-04-21', amount: 249.99, status: 'Completado' },
-              { name: 'Carlos Ruiz', date: '2026-04-21', amount: 129.99, status: 'Pendiente' },
-              { name: 'María López', date: '2026-04-20', amount: 349.99, status: 'Procesando' },
-              { name: 'Juan Pérez', date: '2026-04-20', amount: 89.99, status: 'Completado' },
-              { name: 'Laura Martínez', date: '2026-04-19', amount: 199.99, status: 'Procesando' },
+              
             ].map((order, idx) => (
               <div key={idx} className="order-item">
                 <div className="order-info">
