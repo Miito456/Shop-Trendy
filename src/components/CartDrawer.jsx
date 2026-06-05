@@ -1,8 +1,10 @@
 import React from 'react';
 import { X, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
-const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, clearCart, user }) => {
+const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, clearCart, user, setProducts }) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, item) => acc + (parseFloat(item.price) * item.quantity), 0);
@@ -53,6 +55,16 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
       alert('¡Compra realizada con éxito! Tu pedido está siendo procesado.');
       clearCart();
       onClose();
+
+      // Recargar productos y redirigir al catálogo
+      try {
+        const productosRes = await fetch('http://localhost:3001/api/productos');
+        const productosData = await productosRes.json();
+        if (setProducts) setProducts(productosData);
+      } catch (e) {
+        console.warn('No se pudieron recargar los productos:', e);
+      }
+      navigate('/shop');
 
     } catch (error) {
       console.error('Error al finalizar compra:', error);

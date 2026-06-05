@@ -167,7 +167,8 @@ function AppContent() {
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
         clearCart={clearCart}
-        user={user}  
+        user={user}
+        setProducts={setProducts}
       />
       <AdminLogin
         isOpen={isAdminLoginOpen}

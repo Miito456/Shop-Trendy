@@ -52,13 +52,16 @@ router.get('/:id', async (req, res) => {
 // Este endpoint lo usa el panel de administrador
 router.post('/', async (req, res) => {
   try {
-    const { title, category, price, description, isSoldOut, image } = req.body;
+    console.log('Request body:', req.body);
+    const { title, category, price, description, image } = req.body;
+    const stock = parseInt(req.body.stock, 10);
+    const isSoldOut = stock <= 0;
 
     const resultado = await pool.query(
-      `INSERT INTO products (title, category, price, description, "isSoldOut", image)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO products (title, category, price, description, "isSoldOut", image, stock)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [title, category, price, description, isSoldOut, image]
+      [title, category, price, description, isSoldOut, image, stock]
     );
 
     res.status(201).json(resultado.rows[0]);
@@ -72,14 +75,17 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, category, price, description, isSoldOut, image } = req.body;
+    console.log('Request body:', req.body);
+    const { title, category, price, description, image } = req.body;
+    const stock = parseInt(req.body.stock, 10);
+    const isSoldOut = stock <= 0;
 
     const resultado = await pool.query(
       `UPDATE products 
-       SET title=$1, category=$2, price=$3, description=$4, "isSoldOut"=$5, image=$6
-       WHERE id=$7
+       SET title=$1, category=$2, price=$3, description=$4, "isSoldOut"=$5, image=$6, stock=$7
+       WHERE id=$8
        RETURNING *`,
-      [title, category, price, description, isSoldOut, image, id]
+      [title, category, price, description, isSoldOut, image, stock, id]
     );
 
     if (resultado.rows.length === 0) {

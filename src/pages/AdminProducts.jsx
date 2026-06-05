@@ -72,14 +72,18 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
           />
         </div>
         <div style={{ ...styles.formGroup, flex: 1 }}>
-          <label style={styles.label}>Stock</label>
+          <label style={styles.label}>Stock <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 400 }}>(máx. 1)</span></label>
           <input
             style={styles.input}
             type="number"
             placeholder="0"
             min="0"
+            max="1"
             value={form.stock}
-            onChange={e => setForm(prev => ({ ...prev, stock: e.target.value }))}
+            onChange={e => {
+              const val = Math.min(1, Math.max(0, parseInt(e.target.value) || 0));
+              setForm(prev => ({ ...prev, stock: val }));
+            }}
           />
         </div>
       </div>
@@ -260,6 +264,7 @@ console.log('Key disponible:', !!SUPABASE_KEY);
     description: form.description,
     category:    form.category,
     price:       parseFloat(form.price) || 0,
+    stock:       stockVal,
     isSoldOut:   stockVal <= 0,
     image:       form.imageUrl || form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100'
   };
@@ -308,6 +313,7 @@ console.log('Key disponible:', !!SUPABASE_KEY);
     description: form.description,
     category:    form.category,
     price:       parseFloat(form.price) || 0,
+    stock:       stockVal,
     isSoldOut:   stockVal <= 0,
     image:       form.imageUrl || form.imagenPreview || ''
   };
@@ -319,7 +325,10 @@ console.log('Key disponible:', !!SUPABASE_KEY);
       body:    JSON.stringify(productoActualizado)
     });
     const productoEditado = await res.json();
-    setProducts(prev => prev.map(p => String(p.id) === String(editId) ? productoEditado : p));
+    // Refresh product list after edit to ensure UI reflects latest stock
+    const refreshedRes = await fetch('http://localhost:3001/api/productos');
+    const refreshedData = await refreshedRes.json();
+    setProducts(refreshedData);
     setForm(emptyForm);
     setShowEdit(false);
     setEditId(null);
@@ -417,8 +426,8 @@ console.log('Key disponible:', !!SUPABASE_KEY);
                   <div style={styles.productDesc}>{product.description}</div>
                   <div style={styles.productTags}>
                     <span style={{ ...styles.categoryBadge, ...displayColor }}>{displayCategory}</span>
-                    <span style={{ ...styles.stockBadge, ...(productStock < 5 ? styles.stockLow : styles.stockOk) }}>
-                      Stock: {productStock}
+                    <span style={{ ...styles.stockBadge, ...(productStock >= 1 ? styles.stockOk : styles.stockLow) }}>
+                      {productStock >= 1 ? '✓ En Stock' : '✗ Agotado'}
                     </span>
                   </div>
                 </div>
