@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { fetchUserProfile, isInactiveUser } from '../lib/userStatus';
 
 const AdminLogin = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -30,8 +31,14 @@ const AdminLogin = ({ isOpen, onClose }) => {
       }
 
       // Verificar que sea admin en tu tabla users
-      const res = await fetch(`http://localhost:3001/api/users/${data.user.id}`);
-      const perfil = await res.json();
+      const perfil = await fetchUserProfile(data.user.id);
+
+      if (isInactiveUser(perfil)) {
+        setError('Tu cuenta esta desactivada');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
 
       if (perfil.rol !== 'admin') {
         setError('No tienes permisos de administrador');

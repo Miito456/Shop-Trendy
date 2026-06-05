@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
+const VALID_STATUSES = new Set(['Activo', 'Inactivo']);
 
 // GET — obtener todos los usuarios
 router.get('/', async (req, res) => {
@@ -15,7 +16,10 @@ router.get('/', async (req, res) => {
       GROUP BY u.id
       ORDER BY u.registration_date DESC
     `);
-    res.json(resultado.rows);
+    res.json(resultado.rows.map(user => ({
+      ...user,
+      status: user.status || 'Activo'
+    })));
   } catch (error) {
     console.error('Error al obtener usuarios:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -26,7 +30,11 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const resultado = await pool.query(
-      'SELECT * FROM users WHERE id = $1',
+      `SELECT 
+        u.*,
+        COALESCE(u.status, 'Activo') as status
+       FROM users u
+       WHERE u.id = $1`,
       [id]
     );
 
@@ -43,6 +51,34 @@ router.get('/:id', async (req, res) => {
 
 // PUT — actualizar status del usuario
 // PUT — actualizar perfil del usuario
+router.put('/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!VALID_STATUSES.has(status)) {
+      return res.status(400).json({ error: 'Status de usuario no valido' });
+    }
+
+    const resultado = await pool.query(
+      `UPDATE users
+       SET status = $1
+       WHERE id = $2
+       RETURNING *`,
+      [status, id]
+    );
+
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json(resultado.rows[0]);
+  } catch (error) {
+    console.error('Error al actualizar status:', error.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
