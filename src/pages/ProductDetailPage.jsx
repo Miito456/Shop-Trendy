@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, StarHalf, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { supabase } from '../lib/supabaseClient';
 
 function ProductDetailPage({ cart, addToCart, products, user }) {
   const { id } = useParams();
@@ -45,25 +46,58 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
   };
 
   const handleBuyNow = async () => {
+    // Verificar que el usuario esté autenticado
     if (!user) { alert('Debes iniciar sesión para comprar'); return; }
     if (!window.confirm('¿Confirmas la compra de este producto?')) return;
+
     try {
-      const newStock = Math.max(0, (product.stock || 0) - quantity);
-      const updatedProduct = {
-        ...product,
-        stock: newStock,
-        isSoldOut: newStock <= 0
+      // Obtener el ID del usuario de Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      // Obtener dirección del usuario
+      let shippingAddress = 'No especificada';
+      if (userId) {
+        const perfilRes = await fetch(`http://localhost:3001/api/users/${userId}`);
+        const perfil = await perfilRes.json();
+        shippingAddress = perfil.address || 'No especificada';
+      }
+
+      // Crear la orden
+      const orden = {
+        user_id:          userId,
+        customer_name:    user.name,
+        customer_email:   user.email,
+        total:            parseFloat(product.price) * quantity,
+        status:           'Pendiente',
+        shipping_address: shippingAddress,
+        products: [{
+          name:     product.title,
+          quantity: quantity,
+          price:    parseFloat(product.price)
+        }]
       };
-      const res = await fetch(`http://localhost:3001/api/productos/${product.id}`, {
-        method: 'PUT',
+
+      const res = await fetch('http://localhost:3001/api/orders', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProduct)
+        body:    JSON.stringify(orden)
       });
-      if (!res.ok) throw new Error('Error actualizando producto');
-      alert('¡Compra realizada con éxito!');
-      // Navigate to catalog and force reload to show updated state
+
+      if (!res.ok) throw new Error('Error al crear la orden');
+
+      // Actualizar el stock del producto
+      const newStock = Math.max(0, (product.stock || 0) - quantity);
+      await fetch(`http://localhost:3001/api/productos/${product.id}`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ ...product, stock: newStock, isSoldOut: newStock <= 0 })
+      });
+
+      alert('¡Compra realizada con éxito! Tu pedido está siendo procesado.');
       navigate('/shop');
       window.location.reload();
+
     } catch (error) {
       console.error('Error en compra ahora:', error);
       alert('Error al procesar la compra');
