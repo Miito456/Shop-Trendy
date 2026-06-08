@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import CheckoutModal from './CheckoutModal';
 
 const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, clearCart, user, setProducts }) => {
   const navigate = useNavigate();
+  const [showCheckout, setShowCheckout] = useState(false);
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, item) => acc + (parseFloat(item.price) * item.quantity), 0);
@@ -141,11 +143,20 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
               <span className="summary-label">Total</span>
               <span className="summary-value">${subtotal.toFixed(2)}</span>
             </div>
-            <button className="btn-primary-full mt-4" onClick={handleFinalizarCompra}>
-              Finalizar Compra
-            </button>
+            <button className="btn-primary-full mt-4" onClick={() => setShowCheckout(true)}>
+  Finalizar Compra
+</button>
           </div>
         )}
+        <CheckoutModal
+  isOpen={showCheckout}
+  onClose={() => setShowCheckout(false)}
+  total={subtotal}
+  onSuccess={async () => {
+    setShowCheckout(false);
+    await handleFinalizarCompra();
+  }}
+/>
       </div>
     </div>
   );
