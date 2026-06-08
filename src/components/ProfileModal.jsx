@@ -98,7 +98,17 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
 
         <div className="profile-header">
           <div className="profile-avatar">
-            {user.name ? user.name.substring(0, 2).toUpperCase() : 'UD'}
+            {user.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={user.name}
+                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+              />
+            ) : null}
+            <div style={{ width: '100%', height: '100%', borderRadius: '50%', backgroundColor: '#f59e0b', color: '#fff', display: user.avatar_url ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18 }}>
+              {user.name ? user.name.substring(0, 2).toUpperCase() : 'UD'}
+            </div>
           </div>
           <div className="profile-info-header">
             <h3>{user.name}</h3>
