@@ -43,7 +43,8 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
           name: profile.name || data.user.user_metadata?.full_name || 'Usuario',
           email: data.user.email,
           phone: profile.phone,
-          address: profile.address
+          address: profile.address,
+          avatar_url: data.user.user_metadata?.avatar_url || data.user.user_metadata?.avatarUrl || data.user.user_metadata?.picture || null,
         });
         onClose();
         
