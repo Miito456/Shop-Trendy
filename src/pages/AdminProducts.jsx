@@ -72,14 +72,18 @@ function FormContent({ form, setForm, isEdit, fileInputRef, editFileInputRef, ha
           />
         </div>
         <div style={{ ...styles.formGroup, flex: 1 }}>
-          <label style={styles.label}>Stock</label>
+          <label style={styles.label}>Stock <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 400 }}>(máx. 1)</span></label>
           <input
             style={styles.input}
             type="number"
             placeholder="0"
             min="0"
+            max="1"
             value={form.stock}
-            onChange={e => setForm(prev => ({ ...prev, stock: e.target.value }))}
+            onChange={e => {
+              const val = Math.min(1, Math.max(0, parseInt(e.target.value) || 0));
+              setForm(prev => ({ ...prev, stock: val }));
+            }}
           />
         </div>
       </div>
@@ -171,115 +175,116 @@ function AdminProducts({ products = [], setProducts }) {
   });
 
   const handleImageChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // Validar formato
-  const formatosPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
-  if (!formatosPermitidos.includes(file.type)) {
-    alert('Solo se permiten imágenes JPG, PNG o WebP');
-    return;
-  }
-
-  // Validar tamaño (2MB máximo)
-  const tamanioMaximo = 2 * 1024 * 1024;
-  if (file.size > tamanioMaximo) {
-    alert('La imagen no puede superar 2MB');
-    return;
-  }
-
-  // Mostrar preview inmediatamente
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    setForm(prev => ({ ...prev, imagenPreview: ev.target.result }));
-  };
-  reader.readAsDataURL(file);
-
-  // Subir a Supabase Storage
-  try {
-    const extension = file.name.split('.').pop();
-    const fileName = `producto-${Math.random().toString(36).substring(2, 9)}.${extension}`;
-
-    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-    const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    // Log temporal para ver la URL exacta
-console.log('URL completa:', `${SUPABASE_URL}/storage/v1/object/products/${fileName}`);
-console.log('Key disponible:', !!SUPABASE_KEY);
-
-    const uploadRes = await fetch(
-      `${SUPABASE_URL}/storage/v1/object/products/${fileName}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'apikey': SUPABASE_KEY,
-          'Content-Type': file.type,
-        },
-        body: file
-      }
-    );
-
-    if (!uploadRes.ok) {
-      const errText = await uploadRes.text();
-      console.error('Error subiendo imagen:', errText);
-      alert('Error al subir la imagen');
+    // Validar formato
+    const formatosPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!formatosPermitidos.includes(file.type)) {
+      alert('Solo se permiten imágenes JPG, PNG o WebP');
       return;
     }
 
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${fileName}`;
+    // Validar tamaño (2MB máximo)
+    const tamanioMaximo = 2 * 1024 * 1024;
+    if (file.size > tamanioMaximo) {
+      alert('La imagen no puede superar 2MB');
+      return;
+    }
 
-    setForm(prev => ({
-      ...prev,
-      imagen: file,
-      imagenPreview: publicUrl,
-      imageUrl: publicUrl
-    }));
+    // Mostrar preview inmediatamente
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setForm(prev => ({ ...prev, imagenPreview: ev.target.result }));
+    };
+    reader.readAsDataURL(file);
 
-    console.log('Imagen subida:', publicUrl);
+    // Subir a Supabase Storage
+    try {
+      const extension = file.name.split('.').pop();
+      const fileName = `producto-${Math.random().toString(36).substring(2, 9)}.${extension}`;
 
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error al subir la imagen');
-  }
-};
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  const handleCreate = async () => {
-  if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
-    alert('Por favor completa todos los campos obligatorios.');
-    return;
-  }
-  if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
-    alert('No se permiten cantidades negativas.');
-    return;
-  }
+      // Log temporal para ver la URL exacta
+      console.log('URL completa:', `${SUPABASE_URL}/storage/v1/object/products/${fileName}`);
+      console.log('Key disponible:', !!SUPABASE_KEY);
 
-  const stockVal = parseInt(form.stock) || 0;
-  const nuevoProducto = {
-    title:       form.title,
-    description: form.description,
-    category:    form.category,
-    price:       parseFloat(form.price) || 0,
-    isSoldOut:   stockVal <= 0,
-    image:       form.imageUrl || form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100'
+      const uploadRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/products/${fileName}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'apikey': SUPABASE_KEY,
+            'Content-Type': file.type,
+          },
+          body: file
+        }
+      );
+
+      if (!uploadRes.ok) {
+        const errText = await uploadRes.text();
+        console.error('Error subiendo imagen:', errText);
+        alert('Error al subir la imagen');
+        return;
+      }
+
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${fileName}`;
+
+      setForm(prev => ({
+        ...prev,
+        imagen: file,
+        imagenPreview: publicUrl,
+        imageUrl: publicUrl
+      }));
+
+      console.log('Imagen subida:', publicUrl);
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al subir la imagen');
+    }
   };
 
-  try {
-    const res = await fetch('http://localhost:3001/api/productos', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(nuevoProducto)
-    });
-    const productoCreado = await res.json();
-    setProducts(prev => [...prev, productoCreado]);
+  const handleCreate = async () => {
+    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+    if (parseFloat(form.price) < 0 || parseInt(form.stock) < 0) {
+      alert('No se permiten cantidades negativas.');
+      return;
+    }
 
-    setForm(emptyForm);
-    setShowNew(false);
-  } catch (error) {
-    console.error('Error creando producto:', error);
-    alert('Error al crear el producto');
-  }
-};
+    const stockVal = parseInt(form.stock) || 0;
+    const nuevoProducto = {
+      title: form.title,
+      description: form.description,
+      category: form.category,
+      price: parseFloat(form.price) || 0,
+      stock: stockVal,
+      isSoldOut: stockVal <= 0,
+      image: form.imageUrl || form.imagenPreview || 'https://images.unsplash.com/photo-1735553817396-510cfe7066e6?w=100'
+    };
+
+    try {
+      const res = await fetch('http://localhost:3001/api/productos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoProducto)
+      });
+      const productoCreado = await res.json();
+      setProducts(prev => [...prev, productoCreado]);
+
+      setForm(emptyForm);
+      setShowNew(false);
+    } catch (error) {
+      console.error('Error creando producto:', error);
+      alert('Error al crear el producto');
+    }
+  };
 
   const handleEdit = (product) => {
     setEditId(product.id);
@@ -297,51 +302,55 @@ console.log('Key disponible:', !!SUPABASE_KEY);
   };
 
   const handleUpdate = async () => {
-  if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
-    alert('Por favor completa todos los campos obligatorios.');
-    return;
-  }
+    if (!form.title.trim() || !form.price || !form.stock || !form.description.trim()) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
 
-  const stockVal = parseInt(form.stock) || 0;
-  const productoActualizado = {
-    title:       form.title,
-    description: form.description,
-    category:    form.category,
-    price:       parseFloat(form.price) || 0,
-    isSoldOut:   stockVal <= 0,
-    image:       form.imageUrl || form.imagenPreview || ''
+    const stockVal = parseInt(form.stock) || 0;
+    const productoActualizado = {
+      title: form.title,
+      description: form.description,
+      category: form.category,
+      price: parseFloat(form.price) || 0,
+      stock: stockVal,
+      isSoldOut: stockVal <= 0,
+      image: form.imageUrl || form.imagenPreview || ''
+    };
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/productos/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productoActualizado)
+      });
+      const productoEditado = await res.json();
+      // Refresh product list after edit to ensure UI reflects latest stock
+      const refreshedRes = await fetch('http://localhost:3001/api/productos');
+      const refreshedData = await refreshedRes.json();
+      setProducts(refreshedData);
+      setForm(emptyForm);
+      setShowEdit(false);
+      setEditId(null);
+    } catch (error) {
+      console.error('Error actualizando producto:', error);
+      alert('Error al actualizar el producto');
+    }
   };
 
-  try {
-    const res = await fetch(`http://localhost:3001/api/productos/${editId}`, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(productoActualizado)
-    });
-    const productoEditado = await res.json();
-    setProducts(prev => prev.map(p => String(p.id) === String(editId) ? productoEditado : p));
-    setForm(emptyForm);
-    setShowEdit(false);
-    setEditId(null);
-  } catch (error) {
-    console.error('Error actualizando producto:', error);
-    alert('Error al actualizar el producto');
-  }
-};
-
   const handleDelete = async (id) => {
-  if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
+    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
 
-  try {
-    await fetch(`http://localhost:3001/api/productos/${id}`, {
-      method: 'DELETE'
-    });
-    setProducts(prev => prev.filter(p => String(p.id) !== String(id)));
-  } catch (error) {
-    console.error('Error eliminando producto:', error);
-    alert('Error al eliminar el producto');
-  }
-};
+    try {
+      await fetch(`http://localhost:3001/api/productos/${id}`, {
+        method: 'DELETE'
+      });
+      setProducts(prev => prev.filter(p => String(p.id) !== String(id)));
+    } catch (error) {
+      console.error('Error eliminando producto:', error);
+      alert('Error al eliminar el producto');
+    }
+  };
 
 
   if (localLoading) {
@@ -417,8 +426,8 @@ console.log('Key disponible:', !!SUPABASE_KEY);
                   <div style={styles.productDesc}>{product.description}</div>
                   <div style={styles.productTags}>
                     <span style={{ ...styles.categoryBadge, ...displayColor }}>{displayCategory}</span>
-                    <span style={{ ...styles.stockBadge, ...(productStock < 5 ? styles.stockLow : styles.stockOk) }}>
-                      Stock: {productStock}
+                    <span style={{ ...styles.stockBadge, ...(productStock >= 1 ? styles.stockOk : styles.stockLow) }}>
+                      {productStock >= 1 ? 'En Stock' : 'Agotado'}
                     </span>
                   </div>
                 </div>
@@ -550,7 +559,7 @@ const styles = {
     padding: '10px 16px',
   },
   searchInput: {
-    border:  'none',
+    border: 'none',
     outline: 'none',
     fontSize: '12px',
     color: '#333',

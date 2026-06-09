@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, StarHalf, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { supabase } from '../lib/supabaseClient';
+import CheckoutModal from '../components/CheckoutModal'; 
 
-function ProductDetailPage({ cart, addToCart, products }) {
+function ProductDetailPage({ cart, addToCart, products, user }) {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('M');
   const [activeTab, setActiveTab] = useState('description');
+  const navigate = useNavigate();
+  const [showCheckout, setShowCheckout] = useState(false);
 
 
   useEffect(() => {
@@ -43,6 +47,63 @@ function ProductDetailPage({ cart, addToCart, products }) {
     addToCart({ ...product, size: selectedSize, quantity });
   };
 
+  const handleBuyNow = () => {
+  if (!user) { alert('Debes iniciar sesión para comprar'); return; }
+  setShowCheckout(true);
+};
+
+const handlePaymentSuccess = async () => {
+  setShowCheckout(false);
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+
+    let shippingAddress = 'No especificada';
+    if (userId) {
+      const perfilRes = await fetch(`http://localhost:3001/api/users/${userId}`);
+      const perfil = await perfilRes.json();
+      shippingAddress = perfil.address || 'No especificada';
+    }
+
+    const orden = {
+      user_id:          userId,
+      customer_name:    user.name,
+      customer_email:   user.email,
+      total:            parseFloat(product.price) * quantity,
+      status:           'Pendiente',
+      shipping_address: shippingAddress,
+      products: [{
+        name:     product.title,
+        quantity: quantity,
+        price:    parseFloat(product.price)
+      }]
+    };
+
+    const res = await fetch('http://localhost:3001/api/orders', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(orden)
+    });
+
+    if (!res.ok) throw new Error('Error al crear la orden');
+
+    const newStock = Math.max(0, (product.stock || 0) - quantity);
+    await fetch(`http://localhost:3001/api/productos/${product.id}`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ ...product, stock: newStock, isSoldOut: newStock <= 0 })
+    });
+
+    alert('¡Compra realizada con éxito! Tu pedido está siendo procesado.');
+    navigate('/shop');
+    window.location.reload();
+
+  } catch (error) {
+    console.error('Error al crear la orden tras el pago:', error);
+    alert('Pago exitoso, pero hubo un error al registrar la orden. Contacta soporte.');
+  }
+};
+
   // Dummy related products (excluding the current one)
   const relatedProducts = products.filter(p => p.id !== product.id).slice(0, 4);
 
@@ -57,11 +118,6 @@ function ProductDetailPage({ cart, addToCart, products }) {
         <div className="product-gallery">
           <div className="main-image-container">
             <img src={product.image} alt={product.title} className="main-image" />
-          </div>
-          <div className="thumbnail-list">
-            <img src={product.image} alt="thumb 1" className="thumbnail active" />
-            <img src={product.image} alt="thumb 2" className="thumbnail" />
-            <img src={product.image} alt="thumb 3" className="thumbnail" />
           </div>
         </div>
 
@@ -89,27 +145,14 @@ function ProductDetailPage({ cart, addToCart, products }) {
             {product.description}
           </p>
 
-          <div className="size-selector">
-            <p className="selector-title">Selecciona tu talla</p>
-            <div className="size-options">
-              {['XS', 'S', 'M', 'L', 'XL'].map(size => (
-                <button
-                  key={size}
-                  className={`size-btn ${selectedSize === size ? 'active' : ''}`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
+          
 
           <div className="quantity-selector">
             <p className="selector-title">Cantidad</p>
             <div className="qty-controls">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+              <button onClick={() => setQuantity(Math.max(1))}>-</button>
               <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+              <button onClick={() => setQuantity(1)}>+</button>
             </div>
           </div>
 
@@ -117,7 +160,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
             <button className="btn-add-to-cart" onClick={handleAddToCart} disabled={product.isSoldOut}>
               <ShoppingCart size={18} /> Agregar al Carrito
             </button>
-            <button className="btn-buy-now" disabled={product.isSoldOut}>
+            <button className="btn-buy-now" disabled={product.isSoldOut} onClick={handleBuyNow}>
               Comprar Ahora
             </button>
           </div>
@@ -157,12 +200,16 @@ function ProductDetailPage({ cart, addToCart, products }) {
           >
             Descripción
           </button>
+
+          {/*}
           <button
             className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
             onClick={() => setActiveTab('details')}
           >
             Detalles
           </button>
+            */}
+
           <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
@@ -176,14 +223,13 @@ function ProductDetailPage({ cart, addToCart, products }) {
               <h4>Descripción del Producto</h4>
               <p>
                 {product.description}
-                <br /><br />
-                Lorem ipsum dolor sit amet consectetur adipiscing elit malesuada, purus eleifend integer aliquam risus auctor viverra erat metus, maecenas
-                montes mus hendrerit phasellus tellus vehicula. Ultricies aptent malesuada arcu tempus ultrices leo ullamcorper faucibus, bibendum
-                ante nibh scelerisque per nisl eget pellentesque facilisis, mus metus sem laoreet in non a.
+                
+                
               </p>
             </>
           )}
-
+          
+          {/*}
           {activeTab === 'details' && (
             <div className="product-details-list">
               <h4>Características Principales</h4>
@@ -196,6 +242,7 @@ function ProductDetailPage({ cart, addToCart, products }) {
               </ul>
             </div>
           )}
+            */}
 
           {activeTab === 'reviews' && (
             <div className="product-reviews-list">
@@ -252,13 +299,20 @@ function ProductDetailPage({ cart, addToCart, products }) {
         <div className="related-grid">
           {relatedProducts.map(rp => (
             <ProductCard
-              key={rp.id}
+              key={rp.id} 
               product={rp}
               onAddToCart={() => addToCart(rp)}
             />
           ))}
         </div>
       </div>
+
+      <CheckoutModal
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        total={parseFloat(product.price) * quantity}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 }

@@ -2,9 +2,19 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, ChevronLeft } from 'lucide-react';
 
-const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
+const Header = ({ user, cartCount, onUserIconClick, onCartClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const getInitials = (name) => {
+    if (!name) return 'UD';
+    return name
+      .split(' ')
+      .map(part => part[0] || '')
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   // Hide the storefront header on the admin dashboard
   if (location.pathname === '/admin') {
@@ -38,8 +48,34 @@ const Header = ({ cartCount, onUserIconClick, onCartClick }) => {
       </nav>
 
       <div className="header-right">
-        <button className="icon-btn-minimal" aria-label="Mi Perfil" onClick={onUserIconClick}>
-          <User size={22} strokeWidth={1.5} />
+        <button className="icon-btn-minimal" aria-label="Mi Perfil" onClick={onUserIconClick} style={{ padding: 0 }}>
+          {user ? (
+            user.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={user.name}
+                style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            ) : (
+              <div style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                backgroundColor: '#f59e0b',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: 12,
+              }}>
+                {getInitials(user.name)}
+              </div>
+            )
+          ) : (
+            <User size={22} strokeWidth={1.5} />
+          )}
         </button>
         <button className="icon-btn-minimal cart-btn-light" aria-label="Shopping cart" onClick={onCartClick}>
           <ShoppingBag size={22} strokeWidth={1.5} />

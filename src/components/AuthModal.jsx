@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 // 1. Importamos el cliente de Supabase (ajusta los puntos ../ si es necesario)
 import { supabase } from '../lib/supabaseClient'; 
+import { fetchUserProfile, isInactiveUser } from '../lib/userStatus';
 
 const AuthModal = ({ isOpen, onClose, onLogin }) => {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
@@ -30,10 +31,20 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
 
         if (error) throw error;
 
-        alert('¡Inicio de sesión correcto!');
+        const profile = await fetchUserProfile(data.user.id);
+
+        if (isInactiveUser(profile)) {
+          await supabase.auth.signOut();
+          throw new Error('Tu cuenta esta desactivada. Contacta al administrador.');
+        }
+
+        alert('Inicio de sesion correcto!');
         onLogin({
-          name: data.user.user_metadata?.full_name || 'Usuario',
-          email: data.user.email
+          name: profile.name || data.user.user_metadata?.full_name || 'Usuario',
+          email: data.user.email,
+          phone: profile.phone,
+          address: profile.address,
+          avatar_url: data.user.user_metadata?.avatar_url || data.user.user_metadata?.avatarUrl || data.user.user_metadata?.picture || null,
         });
         onClose();
         

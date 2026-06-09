@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './lib/supabaseClient';
+import { fetchUserProfile, isInactiveUser } from './lib/userStatus';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ShopPage from './pages/ShopPage';
@@ -40,18 +41,39 @@ function AppContent() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const inactiveAlertedUserRef = useRef(null);
   // auth state is persisted by Supabase; initialize and subscribe to changes
   useEffect(() => {
     let subscription;
+    const buildUserData = (profile, authUser) => ({
+      name: profile.name || authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+      email: authUser.email,
+      phone: profile.phone,
+      address: profile.address,
+      avatar_url: authUser.user_metadata?.avatar_url || authUser.user_metadata?.avatarUrl || authUser.user_metadata?.picture || null,
+    });
+
+    const handleInactiveUser = async (userId) => {
+      if (inactiveAlertedUserRef.current === userId) return;
+      inactiveAlertedUserRef.current = userId;
+      alert('Error: Tu cuenta esta desactivada. Contacta al administrador.');
+      await supabase.auth.signOut();
+      setUser(null);
+    };
+
     const init = async () => {
       try {
         const { data } = await supabase.auth.getSession();
         const session = data?.session;
         if (session?.user) {
-          setUser({
-            name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-            email: session.user.email,
-          });
+          const profile = await fetchUserProfile(session.user.id);
+
+          if (isInactiveUser(profile)) {
+            await handleInactiveUser(session.user.id);
+            return;
+          }
+
+          setUser(buildUserData(profile, session.user));
         }
       } catch (err) {
         console.error('Error obteniendo sesión Supabase:', err);
@@ -60,14 +82,25 @@ function AppContent() {
 
     init();
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        setUser({
-          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-          email: session.user.email,
-        });
+        try {
+          const profile = await fetchUserProfile(session.user.id);
+
+          if (isInactiveUser(profile)) {
+            await handleInactiveUser(session.user.id);
+            return;
+          }
+
+          setUser(buildUserData(profile, session.user));
+        } catch (err) {
+          console.error('Error validando usuario:', err);
+          await supabase.auth.signOut();
+          setUser(null);
+        }
       } else {
         setUser(null);
+        inactiveAlertedUserRef.current = null;
       }
     });
 
@@ -121,6 +154,7 @@ function AppContent() {
     <div className="app-container">
       {!isAdmin && (
         <Header 
+          user={user}
           cartCount={cartItemsCount} 
           onUserIconClick={handleUserIconClick}
           onCartClick={() => setIsCartOpen(true)}
@@ -130,7 +164,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/shop" element={<ShopPage cart={cart} addToCart={addToCart} products={products} />} />
-        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} products={products} />} />
+        <Route path="/product/:id" element={<ProductDetailPage cart={cart} addToCart={addToCart} products={products} user={user} />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/productos" element={<AdminProducts products={products} setProducts={setProducts} />} />
@@ -167,7 +201,8 @@ function AppContent() {
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
         clearCart={clearCart}
-        user={user}  
+        user={user}
+        setProducts={setProducts}
       />
       <AdminLogin
         isOpen={isAdminLoginOpen}

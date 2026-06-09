@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@fontsource/geist-sans": "^5.0.0",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.7.0",
     "@supabase/supabase-js": "^2.107.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.383.0",

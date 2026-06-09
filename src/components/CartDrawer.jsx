@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
+import CheckoutModal from './CheckoutModal';
 
-const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, clearCart, user }) => {
+const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, clearCart, user, setProducts }) => {
+  const navigate = useNavigate();
+  const [showCheckout, setShowCheckout] = useState(false);
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, item) => acc + (parseFloat(item.price) * item.quantity), 0);
@@ -54,6 +58,18 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
       clearCart();
       onClose();
 
+      // Recargar productos y redirigir al catálogo
+      try {
+        const productosRes = await fetch('http://localhost:3001/api/productos');
+        const productosData = await productosRes.json();
+        if (setProducts) setProducts(productosData);
+      } catch (e) {
+        console.warn('No se pudieron recargar los productos:', e);
+      }
+      navigate('/shop');
+      // Forzar recarga completa de la página para asegurar que el estado de stock y isSoldOut se refleje
+      window.location.reload();
+
     } catch (error) {
       console.error('Error al finalizar compra:', error);
       alert('Error al procesar la compra. Intenta de nuevo.');
@@ -102,7 +118,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
                         <Minus size={14} />
                       </button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.cartId || item.id, item.quantity + 1)}>
+                      <button onClick={() => updateQuantity(item.cartId || item.id, item.quantity + 1)} disabled={item.quantity >= 1}>
                         <Plus size={14} />
                       </button>
                     </div>
@@ -127,11 +143,20 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
               <span className="summary-label">Total</span>
               <span className="summary-value">${subtotal.toFixed(2)}</span>
             </div>
-            <button className="btn-primary-full mt-4" onClick={handleFinalizarCompra}>
-              Finalizar Compra
-            </button>
+            <button className="btn-primary-full mt-4" onClick={() => setShowCheckout(true)}>
+  Finalizar Compra
+</button>
           </div>
         )}
+        <CheckoutModal
+  isOpen={showCheckout}
+  onClose={() => setShowCheckout(false)}
+  total={subtotal}
+  onSuccess={async () => {
+    setShowCheckout(false);
+    await handleFinalizarCompra();
+  }}
+/>
       </div>
     </div>
   );
