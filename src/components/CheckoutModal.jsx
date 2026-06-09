@@ -86,9 +86,9 @@ function CheckoutModal({ isOpen, onClose, total, onSuccess }) {
     if (!isOpen || total <= 0) return;
 
     fetch('http://localhost:3001/api/payments/create-payment-intent', {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ amount: total })
+      body: JSON.stringify({ amount: total })
     })
       .then(res => res.json())
       .then(data => {
@@ -120,6 +120,8 @@ function CheckoutModal({ isOpen, onClose, total, onSuccess }) {
         padding: '32px',
         width: '100%',
         maxWidth: '480px',
+        maxHeight: '90vh',
+        overflowY: 'auto',
         position: 'relative',
         boxShadow: '0 8px 40px rgba(0,0,0,0.2)'
       }}>
