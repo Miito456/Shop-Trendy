@@ -16,6 +16,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminOrders from './pages/AdminOrders';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsConditions from './pages/TermsConditions';
 import './index.css';
 
 function AppContent() {
@@ -170,6 +172,8 @@ function AppContent() {
         <Route path="/admin/productos" element={<AdminProducts products={products} setProducts={setProducts} />} />
         <Route path="/admin/pedidos" element={<AdminOrders />} />
         <Route path="/admin/usuarios" element={<AdminUsers />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsConditions />} />
       </Routes>
 
       {!isAdmin && (
