@@ -26,7 +26,7 @@ function AdminOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/orders')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders`)
       .then(res => res.json())
       .then(data => {
         setOrders(data);
@@ -59,7 +59,7 @@ function AdminOrders() {
     if (!window.confirm(mensajes[newStatus])) return;
 
     try {
-      await fetch(`http://localhost:3001/api/orders/${id}/status`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -70,14 +70,14 @@ function AdminOrders() {
       }
       // If the order is cancelled, restock its products
       if (newStatus === 'Cancelado') {
-        const orderRes = await fetch(`http://localhost:3001/api/orders/${id}`);
+        const orderRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders/${id}`);
         if (orderRes.ok) {
           const orderData = await orderRes.json();
           if (Array.isArray(orderData.products)) {
             for (const p of orderData.products) {
               // Assuming product ID is p.id or p.productId
               const productId = p.id || p.productId;
-              await fetch(`http://localhost:3001/api/productos/${productId}`, {
+               await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos/${productId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ stock: 1, isSoldOut: false })

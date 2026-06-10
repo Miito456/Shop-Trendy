@@ -2,13 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Search, Filter, Eye, UserX, CheckCircle, ShoppingBag, Mail } from 'lucide-react';
 import UserDetailsModal from './UserDetailsModal';
 
-<<<<<<< HEAD
-const initialUsers = [
-  
-];
-=======
-const API_BASE_URL = 'http://localhost:3001/api';
->>>>>>> main
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api`;
 
 const UsersView = () => {
   const [users, setUsers] = useState([]);
