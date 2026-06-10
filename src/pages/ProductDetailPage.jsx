@@ -26,7 +26,7 @@ function ProductDetailPage({ cart, addToCart, products, user }) {
     setProduct(foundProduct);
     setQuantity(1);
   } else {
-    fetch(`http://localhost:3001/api/productos/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos/${id}`)
       .then(res => res.json())
       .then(data => {
         console.log('producto del backend:', data);
@@ -60,7 +60,7 @@ const handlePaymentSuccess = async () => {
 
     let shippingAddress = 'No especificada';
     if (userId) {
-      const perfilRes = await fetch(`http://localhost:3001/api/users/${userId}`);
+      const perfilRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/${userId}`);
       const perfil = await perfilRes.json();
       shippingAddress = perfil.address || 'No especificada';
     }
@@ -79,7 +79,7 @@ const handlePaymentSuccess = async () => {
       }]
     };
 
-    const res = await fetch('http://localhost:3001/api/orders', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(orden)
@@ -88,7 +88,7 @@ const handlePaymentSuccess = async () => {
     if (!res.ok) throw new Error('Error al crear la orden');
 
     const newStock = Math.max(0, (product.stock || 0) - quantity);
-    await fetch(`http://localhost:3001/api/productos/${product.id}`, {
+    await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos/${product.id}`, {
       method:  'PUT',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ ...product, stock: newStock, isSoldOut: newStock <= 0 })

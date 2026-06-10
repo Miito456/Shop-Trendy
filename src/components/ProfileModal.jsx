@@ -15,7 +15,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
     if (isOpen && user) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user?.id) {
-          fetch(`http://localhost:3001/api/users/${session.user.id}`)
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/${session.user.id}`)
             .then(res => res.json())
             .then(data => {
               setNombre(data.name || '');
@@ -33,7 +33,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
     setLoadingOrders(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.id) {
-        fetch(`http://localhost:3001/api/orders/user/${session.user.id}`)
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders/user/${session.user.id}`)
           .then(res => res.json())
           .then(data => {
             setOrders(data);
@@ -62,7 +62,7 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
         return;
       }
 
-      await fetch(`http://localhost:3001/api/users/${userId}`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: nombre, phone: telefono, address: direccion })

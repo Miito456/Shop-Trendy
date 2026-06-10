@@ -153,7 +153,7 @@ function AdminProducts({ products = [], setProducts }) {
   useEffect(() => {
     if (products.length === 0) {
       setLocalLoading(true);
-      fetch('http://localhost:3001/api/productos')
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos`)
         .then(res => res.json())
         .then(data => {
           setProducts(data);
@@ -270,7 +270,7 @@ function AdminProducts({ products = [], setProducts }) {
     };
 
     try {
-      const res = await fetch('http://localhost:3001/api/productos', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoProducto)
@@ -319,14 +319,14 @@ function AdminProducts({ products = [], setProducts }) {
     };
 
     try {
-      const res = await fetch(`http://localhost:3001/api/productos/${editId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productoActualizado)
       });
       const productoEditado = await res.json();
       // Refresh product list after edit to ensure UI reflects latest stock
-      const refreshedRes = await fetch('http://localhost:3001/api/productos');
+      const refreshedRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos`);
       const refreshedData = await refreshedRes.json();
       setProducts(refreshedData);
       setForm(emptyForm);
@@ -342,7 +342,7 @@ function AdminProducts({ products = [], setProducts }) {
     if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
 
     try {
-      await fetch(`http://localhost:3001/api/productos/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos/${id}`, {
         method: 'DELETE'
       });
       setProducts(prev => prev.filter(p => String(p.id) !== String(id)));

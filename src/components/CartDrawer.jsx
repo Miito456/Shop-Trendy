@@ -26,7 +26,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
       // Obtener dirección del usuario
       let shippingAddress = 'No especificada';
       if (userId) {
-        const perfilRes = await fetch(`http://localhost:3001/api/users/${userId}`);
+        const perfilRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/${userId}`);
         const perfil = await perfilRes.json();
         shippingAddress = perfil.address || 'No especificada';
       }
@@ -46,7 +46,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
         }))
       };
 
-      const res = await fetch('http://localhost:3001/api/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/orders`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(orden)
@@ -60,7 +60,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, cle
 
       // Recargar productos y redirigir al catálogo
       try {
-        const productosRes = await fetch('http://localhost:3001/api/productos');
+        const productosRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos`);
         const productosData = await productosRes.json();
         if (setProducts) setProducts(productosData);
       } catch (e) {

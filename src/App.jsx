@@ -25,7 +25,7 @@ function AppContent() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/productos')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/productos`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);

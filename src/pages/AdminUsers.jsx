@@ -17,7 +17,7 @@ function AdminUsers() {
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  fetch('http://localhost:3001/api/users')
+  fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users`)
     .then(res => res.json())
     .then(data => {
       setUsers(data);
@@ -48,7 +48,7 @@ useEffect(() => {
   if (!window.confirm(mensaje)) return;
 
   try {
-    const res = await fetch(`http://localhost:3001/api/users/${id}/status`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/${id}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: nuevoStatus })

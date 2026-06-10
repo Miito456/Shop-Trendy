@@ -85,7 +85,7 @@ function CheckoutModal({ isOpen, onClose, total, onSuccess }) {
   useEffect(() => {
     if (!isOpen || total <= 0) return;
 
-    fetch('http://localhost:3001/api/payments/create-payment-intent', {
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/payments/create-payment-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: total })
