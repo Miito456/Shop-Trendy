@@ -70,8 +70,8 @@ function Footer({ onAdminClick }) {
         <div className="footer-bottom">
           <p>&copy; {new Date().getFullYear()} Shop Trendy. Todos los derechos reservados.</p>
           <div className="footer-legal">
-            <a href="#" onClick={(e) => { e.preventDefault(); openSupportModal('Privacidad', 'Aviso de privacidad detallado sobre el manejo de tus datos...'); }}>Privacidad</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); openSupportModal('Términos', 'Términos y condiciones de uso de la plataforma...'); }}>Términos</a>
+            <Link to="/privacy" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Privacidad</Link>
+            <Link to="/terms" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Términos</Link>
           </div>
         </div>
       </footer>
